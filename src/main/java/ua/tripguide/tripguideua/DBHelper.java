@@ -17,8 +17,8 @@ import java.io.OutputStream;
     private static String DB_PATH; // Повний шлях до бази даних
     private static String DB_NAME = "MediaDB";
     private static final int VERSION = 1; // версія бази даних
-    public static final String TABLE_CITIES = "cities"; // назва таблиці з містами в бд
-    public static final String TABLE_OBJECTS = "objects"; // назва таблиці з містами в бд
+    static final String TABLE_CITIES = "cities"; // назва таблиці з містами в бд
+    static final String TABLE_OBJECTS = "objects"; // назва таблиці з містами в бд
 
 
 
@@ -67,7 +67,7 @@ import java.io.OutputStream;
             Log.d("DatabaseHelper", ex.getMessage());
         }
     }
-    public SQLiteDatabase open()throws SQLException {
+    SQLiteDatabase open()throws SQLException {
         return SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE);
     }
 }

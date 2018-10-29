@@ -30,9 +30,6 @@ public class CreateExcursionActivity extends AppCompatActivity {
     static final String COLUMN_OBJECT_TYPE = "type_object";
     static final String COLUMN_OBJECT_WORK_TIME = "working_hours";
 
-    private RecyclerView numbersList;
-    private NumbersAdapter numbersAdapter;
-
     //об'єкти класу для роботи з бд
     DBHelper dbHelper;
     SQLiteDatabase db;
@@ -86,33 +83,25 @@ public class CreateExcursionActivity extends AppCompatActivity {
                         userCursor.getString(workTimeObjectIndex)));
             } while (userCursor.moveToNext());
 
-            numbersList = findViewById(R.id.rv_numbers);
-
+            RecyclerView numbersList = findViewById(R.id.rv_numbers);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             numbersList.setLayoutManager(layoutManager);
-
             numbersList.setHasFixedSize(true);
-
-            numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
+            NumbersAdapter numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
             numbersList.setAdapter(numbersAdapter);
         }
 
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
-
         if (id == R.id.action_settings) {
             return true;
         } else if (id == android.R.id.home) {
             finish();
         }
-
         return super.onOptionsItemSelected(item);
-
     }
 }
 
