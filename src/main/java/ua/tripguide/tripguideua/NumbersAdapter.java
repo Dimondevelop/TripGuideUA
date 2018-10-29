@@ -9,7 +9,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +26,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     private ArrayList<ObjectList> CheckedObjects = new ArrayList<>();
     private TextView tvNumberList;
     private TextView tvTypeList;
+    LinearLayout ll_create_excursion_with_objects;
 
     NumbersAdapter(int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
         this.numberItems = numberItems;
@@ -61,7 +61,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
 
     class NumberViewHolder extends RecyclerView.ViewHolder {
 
-        NumberViewHolder(@NonNull View itemView) {
+        NumberViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             tvNumberList = itemView.findViewById(R.id.tv_number_list);
@@ -99,6 +99,8 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                         CheckedObjects.add(mDataObjectList.get(positionIndex));
 
                         if (CheckedObjects.size() == 2){
+                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 85.0f);
+                            LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 15.0f);
 
                         }
                     } else if (chb_create.isChecked()) {
