@@ -97,14 +97,15 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
 
                     if (!chb_create.isChecked()){
                         CheckedObjects.add(mDataObjectList.get(positionIndex));
-                        Toast toast = Toast.makeText(mContextObj,
-                                "додано " + mDataObjectList.get(positionIndex).getCoordinate_x() + " " + mDataObjectList.get(positionIndex).getCoordinate_y() , Toast.LENGTH_SHORT);
-                        toast.show();
+
+                        if (CheckedObjects.size() == 2){
+
+                        }
                     } else if (chb_create.isChecked()) {
-                        Toast toast = Toast.makeText(mContextObj,
-                                "видалено " + mDataObjectList.get(positionIndex).getCoordinate_x() + " " + mDataObjectList.get(positionIndex).getCoordinate_y() , Toast.LENGTH_SHORT);
-                        toast.show();
                         CheckedObjects.remove(mDataObjectList.get(positionIndex));
+                        if (CheckedObjects.size() == 1){
+
+                        }
                     }
 
                     chb_create.toggle();

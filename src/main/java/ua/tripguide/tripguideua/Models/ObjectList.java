@@ -95,4 +95,9 @@ public class ObjectList {
     public void setWorking_hours(String working_hours) {
         this.working_hours = working_hours;
     }
+
+//    @Override
+//    public String toString() {
+//        return  getCoordinate_x() + " " + getCoordinate_y();
+//    }
 }
