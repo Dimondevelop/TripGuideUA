@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#292929"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/borderradius"
+        android:weightSum="100">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="80"
+            android:orientation="vertical"
+            android:padding="3dp">
+            <TextView
+                android:id="@+id/tv_number_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#FFF"
+                android:padding="1dp"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tv_type_list"
+                android:layout_marginTop="3dp"
+                android:padding="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#FFF"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:layout_marginTop="2dp"
+            android:clickable="false"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_more"
+                android:padding="3dp"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:layout_gravity="end"
+                android:background="@drawable/customborder">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/more" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:text="@string/more"
+                    android:textColor="#FFF"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/chb_create"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="8dp"
+                android:scaleX="2.3"
+                android:scaleY="2.3"
+                android:textColor="#000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:buttonTint="#FFF"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+</FrameLayout>

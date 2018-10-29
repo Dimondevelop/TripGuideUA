@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">TripGuideUA</string>
+    <string name="Takyi_ekran">Тут такий собі екран</string>
+    <string name="action_settings">Налаштування</string>
+    <string name="action_email">Емейл</string>
+    <string name="action_menu_SuggestAnObject">Запропонувати об\'єкт</string>
+    <string name="action_menu_2">меню 2</string>
+    <string name="action_menu_3">меню 3</string>
+    <string name="invis_group">Скрити групу</string>
+    <string name="invis_item">Скрити пункт меню</string>
+    <string name="choose_excursion">Підібрати екскурсію</string>
+    <string name="choose_from_list">Обрати зі списку</string>
+    <string name="create_excursion">Створити екскурсію</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="more">Деталі</string>
+    <string name="working_hours">Графік роботи:</string>
+    <string name="type_of">Тип:</string>
+    <string name="on_map">на карті</string>
+</resources>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".City_Activity"
+    android:orientation="vertical"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:weightSum="100"
+        >
+
+        <LinearLayout
+            android:id="@+id/ll_choose_individual_id"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="33.3333"
+            android:background="@drawable/choose_individual"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:icon="@android:drawable/ic_menu_manage"
+            >
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#82000000"
+                android:clickable="false">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center|top"
+                    android:layout_marginTop="20dp"
+                    android:clickable="false"
+                    android:src="@drawable/key_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="@string/choose_excursion"
+                    android:textColor="#FFF"
+                    android:textSize="25sp" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_choose_from_list_id"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="33.3333"
+            android:background="@drawable/choose_from_list"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:icon="@android:drawable/ic_menu_manage">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#82000000"
+                android:clickable="false">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center|top"
+                    android:layout_marginTop="20dp"
+                    android:clickable="false"
+                    android:src="@drawable/list_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="@string/choose_from_list"
+                    android:textColor="#FFF"
+                    android:textSize="25sp" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_create_excursion_id"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="33.3333"
+            android:background="@drawable/create_excursion"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#82000000"
+                android:clickable="false">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center|top"
+                    android:layout_marginTop="20dp"
+                    android:clickable="false"
+                    android:src="@drawable/create_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="@string/create_excursion"
+                    android:textColor="#FFF"
+                    android:textSize="25sp" />
+            </FrameLayout>
+        </LinearLayout>
+
+
+        <!--<ImageView-->
+        <!--android:id="@+id/citythumbnail_id"-->
+        <!--android:layout_width="125dp"-->
+        <!--android:layout_height="170dp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:background="@color/colorBlackLight"-->
+        <!--android:scaleType="centerCrop" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:text="City name"-->
+        <!--android:textSize="18sp"-->
+        <!--android:textStyle="bold" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="#edecec"-->
+        <!--android:padding="8dp"-->
+        <!--android:text="Categotry" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:text="Description"-->
+        <!--android:textSize="18dp" />-->
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
