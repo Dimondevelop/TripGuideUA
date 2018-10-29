@@ -12,7 +12,9 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ua.tripguide.tripguideua.Models.ObjectList;
@@ -22,6 +24,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     private int numberItems;
     private Context mContextObj;
     private List<ObjectList> mDataObjectList;
+    private ArrayList<ObjectList> CheckedObjects = new ArrayList<>();
     private TextView tvNumberList;
     private TextView tvTypeList;
 
@@ -85,14 +88,29 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                 }
             });
 
-
-            itemView.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener CheckBoxListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    chb_create.toggle();
 
+                    int positionIndex = getAdapterPosition();
+
+
+                    if (!chb_create.isChecked()){
+                        CheckedObjects.add(mDataObjectList.get(positionIndex));
+                        Toast toast = Toast.makeText(mContextObj,
+                                "додано " + mDataObjectList.get(positionIndex).getCoordinate_x() + " " + mDataObjectList.get(positionIndex).getCoordinate_y() , Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else if (chb_create.isChecked()) {
+                        Toast toast = Toast.makeText(mContextObj,
+                                "видалено " + mDataObjectList.get(positionIndex).getCoordinate_x() + " " + mDataObjectList.get(positionIndex).getCoordinate_y() , Toast.LENGTH_SHORT);
+                        toast.show();
+                        CheckedObjects.remove(mDataObjectList.get(positionIndex));
+                    }
+
+                    chb_create.toggle();
                 }
-            });
+            };
+            itemView.setOnClickListener(CheckBoxListener);
 
             itemView.setOnHoverListener(new View.OnHoverListener() {
                 @Override

@@ -84,6 +84,7 @@
                 android:layout_marginStart="8dp"
                 android:scaleX="2.3"
                 android:scaleY="2.3"
+                android:clickable="false"
                 android:textColor="#000"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
