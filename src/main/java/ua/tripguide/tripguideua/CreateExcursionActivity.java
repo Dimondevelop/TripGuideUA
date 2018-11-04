@@ -113,9 +113,9 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     @Override
     public void onCardClick(View view, int position) {
         if (numbersAdapter.isFlag()){
-            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 85.0f));
+            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 92.0f));
             linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 15.0f));
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
         } else {
             rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
             linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
