@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,7 @@ import java.util.Objects;
 
 import ua.tripguide.tripguideua.Models.ObjectList;
 
-public class CreateExcursionActivity extends AppCompatActivity {
+public class CreateExcursionActivity extends AppCompatActivity implements NumbersAdapter.OnCardClickListener{
 
     List<ObjectList> lstObjectList;
 
@@ -34,6 +37,9 @@ public class CreateExcursionActivity extends AppCompatActivity {
     DBHelper dbHelper;
     SQLiteDatabase db;
     Cursor userCursor;
+    LinearLayout linearLayout;
+    NumbersAdapter numbersAdapter;
+    RecyclerView rv_numbers;
 
 
     @Override
@@ -83,12 +89,13 @@ public class CreateExcursionActivity extends AppCompatActivity {
                         userCursor.getString(workTimeObjectIndex)));
             } while (userCursor.moveToNext());
 
-            RecyclerView numbersList = findViewById(R.id.rv_numbers);
+            rv_numbers = findViewById(R.id.rv_numbers);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            numbersList.setLayoutManager(layoutManager);
-            numbersList.setHasFixedSize(true);
-            NumbersAdapter numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
-            numbersList.setAdapter(numbersAdapter);
+            rv_numbers.setLayoutManager(layoutManager);
+            rv_numbers.setHasFixedSize(true);
+            numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
+            numbersAdapter.setOnCardClickListener(this);
+            rv_numbers.setAdapter(numbersAdapter);
         }
 
     }
@@ -102,6 +109,18 @@ public class CreateExcursionActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onCardClick(View view, int position) {
+        if (numbersAdapter.isFlag()){
+            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 85.0f));
+            linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 15.0f));
+        } else {
+            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
+            linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
+        }
     }
 }
 

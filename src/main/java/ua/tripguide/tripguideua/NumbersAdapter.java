@@ -26,11 +26,20 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     private ArrayList<ObjectList> CheckedObjects = new ArrayList<>();
     private TextView tvNumberList;
     private TextView tvTypeList;
-    LinearLayout ll_create_excursion_with_objects;
+    private boolean flag = false;
 
-    NumbersAdapter(int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
+    public boolean isFlag() {
+        return flag;
+    }
+
+    interface OnCardClickListener {
+        void onCardClick(View view,  int position);
+    }
+
+    private static OnCardClickListener mListener;
+
+    NumbersAdapter (int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
         this.numberItems = numberItems;
-
         this.mContextObj = mContextObj;
         this.mDataObjectList = mDataObjectList;
     }
@@ -49,9 +58,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
 
     @Override
     public void onBindViewHolder(@NonNull NumberViewHolder numberViewHolder, int position) {
-
         numberViewHolder.bind(position);
-
     }
 
     @Override
@@ -59,7 +66,13 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
         return numberItems;
     }
 
-    class NumberViewHolder extends RecyclerView.ViewHolder {
+    // метод-сеттер для привязки колбэка к получателю событий
+    public void setOnCardClickListener(OnCardClickListener listener) {
+        mListener = listener;
+    }
+
+
+    class NumberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         NumberViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -67,7 +80,6 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             tvNumberList = itemView.findViewById(R.id.tv_number_list);
             tvTypeList = itemView.findViewById(R.id.tv_type_list);
             LinearLayout ll_more = itemView.findViewById(R.id.ll_more);
-            final CheckBox chb_create = itemView.findViewById(R.id.chb_create);
 
             ll_more.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -87,46 +99,36 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                     mContextObj.startActivity(intent);
                 }
             });
-
-            View.OnClickListener CheckBoxListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    int positionIndex = getAdapterPosition();
-
-
-                    if (!chb_create.isChecked()){
-                        CheckedObjects.add(mDataObjectList.get(positionIndex));
-
-                        if (CheckedObjects.size() == 2){
-                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 85.0f);
-                            LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 15.0f);
-
-                        }
-                    } else if (chb_create.isChecked()) {
-                        CheckedObjects.remove(mDataObjectList.get(positionIndex));
-                        if (CheckedObjects.size() == 1){
-
-                        }
-                    }
-
-                    chb_create.toggle();
-                }
-            };
-            itemView.setOnClickListener(CheckBoxListener);
-
-            itemView.setOnHoverListener(new View.OnHoverListener() {
-                @Override
-                public boolean onHover(View view, MotionEvent motionEvent) {
-                    return false;
-                }
-            });
-
+            itemView.setOnClickListener(this);
         }
 
         void bind(int position){
             tvNumberList.setText(mDataObjectList.get(position).getName_object());
             tvTypeList.setText(String.format(" Тип: %s", mDataObjectList.get(position).getType_object()));
+        }
+
+
+        CheckBox chb_create = itemView.findViewById(R.id.chb_create);
+        @Override
+        public void onClick(View v) {
+            int positionIndex = getAdapterPosition();
+            if (!chb_create.isChecked()){
+                CheckedObjects.add(mDataObjectList.get(positionIndex));
+
+                if (CheckedObjects.size() == 2){
+                    flag = true;
+                }
+            } else if (chb_create.isChecked()) {
+                CheckedObjects.remove(mDataObjectList.get(positionIndex));
+                if (CheckedObjects.size() == 1){
+                    flag = false;
+                }
+            }
+
+            chb_create.toggle();
+
+            int position = getAdapterPosition();
+            mListener.onCardClick(v, position);
         }
     }
 }
