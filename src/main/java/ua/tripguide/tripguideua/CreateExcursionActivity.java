@@ -1,5 +1,6 @@
 package ua.tripguide.tripguideua;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Objects;
 
 import ua.tripguide.tripguideua.Models.ObjectList;
 
-public class CreateExcursionActivity extends AppCompatActivity implements NumbersAdapter.OnCardClickListener{
+public class CreateExcursionActivity extends AppCompatActivity implements NumbersAdapter.OnObjectClickListener {
 
     List<ObjectList> lstObjectList;
 
@@ -41,7 +41,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     NumbersAdapter numbersAdapter;
     RecyclerView rv_numbers;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +53,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Оберіть об'єкти для створення екскурсії в місті " + cityName);
-
 
         dbHelper = new DBHelper(getApplicationContext());
         // создаем базу данных
@@ -89,15 +87,24 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                         userCursor.getString(workTimeObjectIndex)));
             } while (userCursor.moveToNext());
 
+            linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context vContext = v.getContext();
+                    Intent intent = new Intent(vContext, RoutesActivity.class);
+                    vContext.startActivity(intent);
+                }
+            });
+
             rv_numbers = findViewById(R.id.rv_numbers);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             rv_numbers.setLayoutManager(layoutManager);
             rv_numbers.setHasFixedSize(true);
             numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
-            numbersAdapter.setOnCardClickListener(this);
+            numbersAdapter.setOnObjectClickListener(this);
             rv_numbers.setAdapter(numbersAdapter);
         }
-
     }
 
     @Override
@@ -110,15 +117,14 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
-    public void onCardClick(View view, int position) {
+    public void onObjectClick(View view, int position) {
         if (numbersAdapter.isFlag()){
             rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 92.0f));
-            linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
             linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
         } else {
             rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
-            linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
             linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
         }
     }

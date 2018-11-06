@@ -16,4 +16,6 @@
     <string name="working_hours">Графік роботи:</string>
     <string name="type_of">Тип:</string>
     <string name="on_map">на карті</string>
+    <string name="title_activity_routes">Map</string>
+    <string name="test">ТестГолоп</string>
 </resources>

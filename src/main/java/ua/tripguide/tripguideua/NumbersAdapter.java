@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +30,11 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
         return flag;
     }
 
-    interface OnCardClickListener {
-        void onCardClick(View view,  int position);
+    interface OnObjectClickListener {
+        void onObjectClick(View view, int position);
     }
 
-    private static OnCardClickListener mListener;
+    private static OnObjectClickListener mListener;
 
     NumbersAdapter (int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
         this.numberItems = numberItems;
@@ -66,8 +64,8 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
         return numberItems;
     }
 
-    // метод-сеттер для привязки колбэка к получателю событий
-    public void setOnCardClickListener(OnCardClickListener listener) {
+    // метод-сеттер для прив'язки колбека до отримувача подій
+    public void setOnObjectClickListener(OnObjectClickListener listener) {
         mListener = listener;
     }
 
@@ -107,7 +105,6 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             tvTypeList.setText(String.format(" Тип: %s", mDataObjectList.get(position).getType_object()));
         }
 
-
         CheckBox chb_create = itemView.findViewById(R.id.chb_create);
         @Override
         public void onClick(View v) {
@@ -128,7 +125,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             chb_create.toggle();
 
             int position = getAdapterPosition();
-            mListener.onCardClick(v, position);
+            mListener.onObjectClick(v, position);
         }
     }
 }
