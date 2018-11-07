@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
@@ -28,8 +29,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     private LatLng startLatLng, endLatLng;
 
     private HttpURLConnection httpURLConnection = null;
-    private String data = "";
-    private InputStream inputStream = null;
+    String data = "";
+    InputStream inputStream = null;
     Context c;
 
     public GetDirectionsData(Context c) {
@@ -70,38 +71,82 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     protected void onPostExecute(String s) {
 
         try {
-            JSONObject jsonObject = new JSONObject(s);
-            JSONArray jsonArray = jsonObject.getJSONArray("routes")
-                    .getJSONObject(0).getJSONArray("legs")
-                    .getJSONObject(0).getJSONArray("steps");
+            JSONObject jsonObjectResponse = new JSONObject(s);
+            JSONArray jsonArrayRoutes = jsonObjectResponse.getJSONArray("routes");
 
-            int count_jsonArray = jsonArray.length();
-            String[] poliline_array = new String[count_jsonArray];
+            JSONArray jsonArrayLegs = jsonArrayRoutes.getJSONObject(0).getJSONArray("legs");
+            int countJsonArrayLegs = jsonArrayLegs.length();
 
-            JSONObject jsonObject_continue;
+            ArrayList<ArrayList<String>> arrayListLegs = new ArrayList<>();
+            ArrayList<String> arrayListSteps = new ArrayList<>();
 
-            for (int i = 0; i < count_jsonArray; i++) {
-                jsonObject_continue = jsonArray.getJSONObject(i);
+            JSONArray[] jsonArraySteps = new  JSONArray[countJsonArrayLegs];
+            JSONObject jsonObjectInSteps;
+            for (int i = 0; i < countJsonArrayLegs; i++) {
+                jsonArraySteps[i] = jsonArrayLegs.getJSONObject(i).getJSONArray("steps");
+                int count_jsonArray = jsonArraySteps[i].length();
 
-                String polygone = jsonObject_continue.getJSONObject("polyline").getString("points");
+                for (int j = 0; j < count_jsonArray; j++){
+                    jsonObjectInSteps = jsonArraySteps[i].getJSONObject(j);
 
-                poliline_array[i] = polygone;
+                    String polygone = jsonObjectInSteps.getJSONObject("polyline").getString("points");
+
+                    arrayListSteps.add(polygone);
+                }
+                arrayListSteps = new ArrayList<>(arrayListSteps);
+                arrayListLegs.add(arrayListSteps);
+
             }
 
-            int count_poliline_array = poliline_array.length;
+            for (ArrayList<String> arrayList:arrayListLegs) {
+                for (String poliline:arrayList) {
+                    PolylineOptions options = new PolylineOptions();
+                    options.color(Color.BLUE);
+                    options.width(10);
+                    options.addAll(PolyUtil.decode(poliline));
 
-            for (int i = 0; i < count_poliline_array; i++) {
-                PolylineOptions options2 = new PolylineOptions();
-                options2.color(Color.BLUE);
-                options2.width(10);
-                options2.addAll(PolyUtil.decode(poliline_array[i]));
+                    mMap.addPolyline(options);
+                }
 
-                mMap.addPolyline(options2);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+//
+//        try {
+//            JSONObject jsonObject = new JSONObject(s);
+//            JSONArray jsonArraySteps = jsonObject.getJSONArray("routes")
+//                    .getJSONObject(0).getJSONArray("legs")
+//                    .getJSONObject(0).getJSONArray("steps");
+//
+//            int count_jsonArray = jsonArraySteps.length();
+//            String[] poliline_array = new String[count_jsonArray];
+//
+//            JSONObject jsonObject_continue;
+//
+//            for (int j = 0; j < count_jsonArray; j++) {
+//                jsonObject_continue = jsonArraySteps.getJSONObject(j);
+//
+//                String polygone = jsonObject_continue.getJSONObject("polyline").getString("points");
+//
+//                poliline_array[j] = polygone;
+//            }
+//
+//            int count_poliline_array = poliline_array.length;
+//
+//            for (int i = 0; i < count_poliline_array; i++) {
+//                PolylineOptions options2 = new PolylineOptions();
+//                options2.color(Color.BLUE);
+//                options2.width(10);
+//                options2.addAll(PolyUtil.decode(poliline_array[i]));
+//
+//                mMap.addPolyline(options2);
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
         super.onPostExecute(s);
     }

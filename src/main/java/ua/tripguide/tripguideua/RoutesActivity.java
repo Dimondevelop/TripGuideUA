@@ -19,7 +19,10 @@ public class RoutesActivity extends FragmentActivity implements OnMapReadyCallba
     static final String GOOGLE_API_KEY = "AIzaSyA-1OzdivurrFOMUPOYBV6QaKwMArDoR5I";
     StringBuilder url;
     LatLng latLngStart = new LatLng(48.258164, 25.929889);
-    LatLng latLngEnd = new LatLng(48.268379, 25.942552);
+    LatLng latLng1 = new LatLng(48.268377, 25.929941);
+    LatLng latLng2 = new LatLng(48.296992, 25.922283);
+    LatLng latLng3 = new LatLng(48.286992, 25.942283);
+    LatLng latLngEnd = new LatLng(48.279832, 25.937631);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +56,18 @@ public class RoutesActivity extends FragmentActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng latLng = new LatLng(48.258164, 25.929889);
-//        mMap.addMarker(new MarkerOptions().position(latLng)
-//                .title("Шось тут"));
+
 
         url = new StringBuilder()
                 .append("https://maps.googleapis.com/maps/api/directions/json?")
-                .append("origin=").append(latLng.latitude).append(",").append(latLng.longitude)
+                .append("origin=").append(latLngStart.latitude).append(",").append(latLngStart.longitude)
                 .append("&destination=").append(latLngEnd.latitude).append(",").append(latLngEnd.longitude)
-                .append("&key=" + GOOGLE_API_KEY);
+                .append("&waypoints=").append(latLng1.latitude).append(",").append(latLng1.longitude)
+                .append("|").append(latLng2.latitude).append(",").append(latLng2.longitude)
+                .append("|").append(latLng3.latitude).append(",").append(latLng3.longitude)
+                .append("&mode=walking")
+                .append("&key=" + GOOGLE_API_KEY)
+                .append("&alternatives=false");
 
         Object[] dataTransfer = new Object[4];
 
@@ -74,8 +79,8 @@ public class RoutesActivity extends FragmentActivity implements OnMapReadyCallba
 
         getDirectionsData.execute(dataTransfer);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16), 50, null);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngStart));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngStart, 16), 50, null);
 
     }
 }
