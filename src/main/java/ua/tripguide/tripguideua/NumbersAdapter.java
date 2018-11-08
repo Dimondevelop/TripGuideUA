@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,12 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     private TextView tvTypeList;
     private boolean flag = false;
 
-    public boolean isFlag() {
+    boolean isFlag() {
         return flag;
+    }
+
+    ArrayList<ObjectList> getCheckedObjects() {
+        return CheckedObjects;
     }
 
     interface OnObjectClickListener {
@@ -36,7 +41,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
 
     private static OnObjectClickListener mListener;
 
-    NumbersAdapter (int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
+    NumbersAdapter(int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
         this.numberItems = numberItems;
         this.mContextObj = mContextObj;
         this.mDataObjectList = mDataObjectList;
@@ -65,12 +70,12 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     }
 
     // метод-сеттер для прив'язки колбека до отримувача подій
-    public void setOnObjectClickListener(OnObjectClickListener listener) {
+    void setOnObjectClickListener(OnObjectClickListener listener) {
         mListener = listener;
     }
 
 
-    class NumberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class NumberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         NumberViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -84,14 +89,14 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                 public void onClick(View v) {
                     int positionIndex = getAdapterPosition();
 
-                    Intent intent = new Intent(mContextObj,MoreActivity.class);
-                    intent.putExtra("name_object",mDataObjectList.get(positionIndex).getName_object());
-                    intent.putExtra("coordinate_x",mDataObjectList.get(positionIndex).getCoordinate_x());
-                    intent.putExtra("coordinate_y",mDataObjectList.get(positionIndex).getCoordinate_y());
-                    intent.putExtra("thumbnail_object",mDataObjectList.get(positionIndex).getThumbnail_object());
-                    intent.putExtra("object_description",mDataObjectList.get(positionIndex).getObject_description());
-                    intent.putExtra("working_hours",mDataObjectList.get(positionIndex).getWorking_hours());
-                    intent.putExtra("type_object",mDataObjectList.get(positionIndex).getType_object());
+                    Intent intent = new Intent(mContextObj, MoreActivity.class);
+                    intent.putExtra("name_object", mDataObjectList.get(positionIndex).getName_object());
+                    intent.putExtra("coordinate_x", mDataObjectList.get(positionIndex).getCoordinate_x());
+                    intent.putExtra("coordinate_y", mDataObjectList.get(positionIndex).getCoordinate_y());
+                    intent.putExtra("thumbnail_object", mDataObjectList.get(positionIndex).getThumbnail_object());
+                    intent.putExtra("object_description", mDataObjectList.get(positionIndex).getObject_description());
+                    intent.putExtra("working_hours", mDataObjectList.get(positionIndex).getWorking_hours());
+                    intent.putExtra("type_object", mDataObjectList.get(positionIndex).getType_object());
 
                     //start the activity
                     mContextObj.startActivity(intent);
@@ -100,24 +105,36 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             itemView.setOnClickListener(this);
         }
 
-        void bind(int position){
+        void bind(int position) {
             tvNumberList.setText(mDataObjectList.get(position).getName_object());
             tvTypeList.setText(String.format(" Тип: %s", mDataObjectList.get(position).getType_object()));
         }
 
         CheckBox chb_create = itemView.findViewById(R.id.chb_create);
+
         @Override
         public void onClick(View v) {
             int positionIndex = getAdapterPosition();
-            if (!chb_create.isChecked()){
+            if (!chb_create.isChecked()) {
                 CheckedObjects.add(mDataObjectList.get(positionIndex));
 
-                if (CheckedObjects.size() == 2){
+                //DEBUG
+//                StringBuilder string = new StringBuilder();
+//                for (int i = 0; i < getCheckedObjects().size(); i++){
+//                   string.append("\n LA: ").append(getCheckedObjects().get(i).getCoordinate_x());
+//                   string.append(" RO: ").append(getCheckedObjects().get(i).getCoordinate_y());
+//                }
+//                Toast toast = Toast.makeText(mContextObj,
+//                        string.toString(), Toast.LENGTH_SHORT);
+//                toast.show();
+
+
+                if (CheckedObjects.size() == 2) {
                     flag = true;
                 }
             } else if (chb_create.isChecked()) {
                 CheckedObjects.remove(mDataObjectList.get(positionIndex));
-                if (CheckedObjects.size() == 1){
+                if (CheckedObjects.size() == 1) {
                     flag = false;
                 }
             }
@@ -127,5 +144,6 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             int position = getAdapterPosition();
             mListener.onObjectClick(v, position);
         }
+
     }
 }

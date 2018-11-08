@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     LinearLayout linearLayout;
     NumbersAdapter numbersAdapter;
     RecyclerView rv_numbers;
+
+    float[] coordinates_x;
+    float[] coordinates_y;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,14 +92,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
             } while (userCursor.moveToNext());
 
             linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
-            linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context vContext = v.getContext();
-                    Intent intent = new Intent(vContext, RoutesActivity.class);
-                    vContext.startActivity(intent);
-                }
-            });
 
             rv_numbers = findViewById(R.id.rv_numbers);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -104,6 +100,59 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
             numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
             numbersAdapter.setOnObjectClickListener(this);
             rv_numbers.setAdapter(numbersAdapter);
+
+
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
+                    coordinates_x = new float[countCheckedObjects];
+                    coordinates_y = new float[countCheckedObjects];
+
+                    for (int i = 0; i < countCheckedObjects; i++) {
+                        coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
+                        coordinates_y[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_y();
+                    }
+
+                    Context vContext = v.getContext();
+                    Intent intent = new Intent(vContext, RoutesActivity.class);
+                    intent.putExtra("coordinates_x", coordinates_x);
+                    intent.putExtra("coordinates_y", coordinates_y);
+                    vContext.startActivity(intent);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onObjectClick(View view, int position) {
+
+        //DEBUG
+//        int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
+//        coordinates_x = new float[countCheckedObjects];
+//        coordinates_y = new float[countCheckedObjects];
+//
+//        for (int i = 0; i < countCheckedObjects; i++) {
+//            coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
+//            coordinates_y[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_y();
+//        }
+//
+//        StringBuilder string = new StringBuilder();
+//        for (int i = 0; i < coordinates_x.length; i++){
+//            string.append("\n LA: ").append(coordinates_x[i]);
+//            string.append(" RO: ").append(coordinates_y[i]);
+//        }
+//        Toast toast = Toast.makeText(getApplicationContext(),
+//                string.toString(), Toast.LENGTH_SHORT);
+//        toast.show();
+
+        if (numbersAdapter.isFlag()) {
+            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 92.0f));
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
+        } else {
+            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
+            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
         }
     }
 
@@ -117,20 +166,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         }
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onObjectClick(View view, int position) {
-        if (numbersAdapter.isFlag()){
-            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 92.0f));
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
-        } else {
-            rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
-        }
-    }
 }
-
-
 
 
 //

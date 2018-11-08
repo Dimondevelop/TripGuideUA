@@ -5,8 +5,11 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Cap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -103,6 +106,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     PolylineOptions options = new PolylineOptions();
                     options.color(Color.BLUE);
                     options.width(10);
+                    options.startCap(new RoundCap());
+                    options.endCap(new SquareCap());
                     options.addAll(PolyUtil.decode(poliline));
 
                     mMap.addPolyline(options);
