@@ -16,6 +16,7 @@ import java.util.Objects;
 
 
 import ua.tripguide.tripguideua.Models.City;
+import ua.tripguide.tripguideua.Utils.DBHelper;
 
 public class MainActivity extends AppCompatActivity {
     //список з містами

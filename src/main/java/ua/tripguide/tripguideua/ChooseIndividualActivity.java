@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.Objects;
 
+import ua.tripguide.tripguideua.Utils.DBHelper;
+
 public class ChooseIndividualActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button btnAdd, btnRead, btnClear;
