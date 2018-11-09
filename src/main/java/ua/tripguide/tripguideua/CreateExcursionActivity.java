@@ -56,7 +56,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Оберіть об'єкти для створення екскурсії в місті " + cityName);
+        getSupportActionBar().setTitle("Оберіть об'єкти");
 
         dbHelper = new DBHelper(getApplicationContext());
         // создаем базу данных
@@ -100,7 +100,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
             numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
             numbersAdapter.setOnObjectClickListener(this);
             rv_numbers.setAdapter(numbersAdapter);
-
 
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
