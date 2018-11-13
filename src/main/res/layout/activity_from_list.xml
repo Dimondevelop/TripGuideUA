@@ -17,7 +17,7 @@ android:layout_height="match_parent"
 android:id="@+id/layout">
 
 <fragment
-    android:id="@+id/map"
+    android:id="@+id/map_list"
     class="com.google.android.gms.maps.SupportMapFragment"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

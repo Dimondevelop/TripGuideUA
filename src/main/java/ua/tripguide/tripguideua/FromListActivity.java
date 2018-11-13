@@ -53,9 +53,15 @@ public class FromListActivity extends AppCompatActivity  implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_from_list);
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_list);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        } else {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "mapFragment is null!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -73,7 +79,7 @@ public class FromListActivity extends AppCompatActivity  implements
     }
 
     /**
-     * Enables the My Location layer if the fine location permission has been granted.
+     * Вмикає місцезнаходження, якщо дозвіл на точне місцезнаходження було надано.
      */
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -133,8 +139,6 @@ public class FromListActivity extends AppCompatActivity  implements
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
-
-
 
     // Кнопка назад
     @Override

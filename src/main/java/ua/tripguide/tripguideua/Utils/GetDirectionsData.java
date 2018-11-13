@@ -118,40 +118,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//
-//        try {
-//            JSONObject jsonObject = new JSONObject(s);
-//            JSONArray jsonArraySteps = jsonObject.getJSONArray("routes")
-//                    .getJSONObject(0).getJSONArray("legs")
-//                    .getJSONObject(0).getJSONArray("steps");
-//
-//            int count_jsonArray = jsonArraySteps.length();
-//            String[] poliline_array = new String[count_jsonArray];
-//
-//            JSONObject jsonObject_continue;
-//
-//            for (int j = 0; j < count_jsonArray; j++) {
-//                jsonObject_continue = jsonArraySteps.getJSONObject(j);
-//
-//                String polygone = jsonObject_continue.getJSONObject("polyline").getString("points");
-//
-//                poliline_array[j] = polygone;
-//            }
-//
-//            int count_poliline_array = poliline_array.length;
-//
-//            for (int i = 0; i < count_poliline_array; i++) {
-//                PolylineOptions options2 = new PolylineOptions();
-//                options2.color(Color.BLUE);
-//                options2.width(10);
-//                options2.addAll(PolyUtil.decode(poliline_array[i]));
-//
-//                mMap.addPolyline(options2);
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
 
         super.onPostExecute(s);
     }
