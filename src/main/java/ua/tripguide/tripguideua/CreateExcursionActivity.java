@@ -44,6 +44,8 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
 
     float[] coordinates_x;
     float[] coordinates_y;
+    String[] titles;
+    String[] workingHours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,16 +110,22 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                     int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
                     coordinates_x = new float[countCheckedObjects];
                     coordinates_y = new float[countCheckedObjects];
+                    titles = new String[countCheckedObjects];
+                    workingHours = new String[countCheckedObjects];
 
                     for (int i = 0; i < countCheckedObjects; i++) {
                         coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
                         coordinates_y[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_y();
+                        titles[i] = numbersAdapter.getCheckedObjects().get(i).getName_object();
+                        workingHours[i] = numbersAdapter.getCheckedObjects().get(i).getWorking_hours();
                     }
 
                     Context vContext = v.getContext();
                     Intent intent = new Intent(vContext, RoutesActivity.class);
                     intent.putExtra("coordinates_x", coordinates_x);
                     intent.putExtra("coordinates_y", coordinates_y);
+                    intent.putExtra("titles", titles);
+                    intent.putExtra("workingHours", workingHours);
                     vContext.startActivity(intent);
                 }
             });

@@ -118,17 +118,6 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
             if (!chb_create.isChecked()) {
                 CheckedObjects.add(mDataObjectList.get(positionIndex));
 
-                //DEBUG
-//                StringBuilder string = new StringBuilder();
-//                for (int i = 0; i < getCheckedObjects().size(); i++){
-//                   string.append("\n LA: ").append(getCheckedObjects().get(i).getCoordinate_x());
-//                   string.append(" RO: ").append(getCheckedObjects().get(i).getCoordinate_y());
-//                }
-//                Toast toast = Toast.makeText(mContextObj,
-//                        string.toString(), Toast.LENGTH_SHORT);
-//                toast.show();
-
-
                 if (CheckedObjects.size() == 2) {
                     flag = true;
                 }

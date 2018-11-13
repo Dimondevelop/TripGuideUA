@@ -74,6 +74,8 @@ public class RoutesActivity extends AppCompatActivity implements
 
     private LatLng[] latLngs;
     int countLatLngs;
+    String[] titles;
+    String[] workingHours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,9 @@ public class RoutesActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         float[] coordinates_y = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_y");
         float[] coordinates_x = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_x");
+        titles =  Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
+        workingHours =  Objects.requireNonNull(intent.getExtras()).getStringArray("workingHours");
+
 
         if (coordinates_x != null && coordinates_y != null) {
             countLatLngs = coordinates_x.length;
@@ -145,8 +150,8 @@ public class RoutesActivity extends AppCompatActivity implements
         getDirectionsData.execute(dataTransfer);
 
         for (int i = 0; i < latLngs.length; i++) {
-            mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet("Snippet")
-                    .title("title " + i));
+            mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(workingHours[i])
+                    .title(titles[i]));
         }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
@@ -223,8 +228,6 @@ public class RoutesActivity extends AppCompatActivity implements
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-
-
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -239,7 +242,6 @@ public class RoutesActivity extends AppCompatActivity implements
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
