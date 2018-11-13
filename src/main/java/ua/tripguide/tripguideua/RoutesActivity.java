@@ -48,6 +48,8 @@ public class RoutesActivity extends AppCompatActivity implements
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
+    RequestBuilder requestBuilder;
+
     Context mContext = this;
 
     private Location mLastKnownLocation;
@@ -129,12 +131,12 @@ public class RoutesActivity extends AppCompatActivity implements
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
 
-        RequestBuilder requestBuilder = new RequestBuilder();
+        requestBuilder = new RequestBuilder();
         String url = requestBuilder.buildUrl(latLngs);
 
         Object[] dataTransfer = new Object[4];
 
-        GetDirectionsData getDirectionsData = new GetDirectionsData(getApplicationContext());
+        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext);
         dataTransfer[0] = mMap;
         dataTransfer[1] = url;
         dataTransfer[2] = new LatLng(latLngs[0].latitude, latLngs[0].longitude);
@@ -145,7 +147,7 @@ public class RoutesActivity extends AppCompatActivity implements
         for (int i = 0; i < latLngs.length; i++) {
             mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet("Snippet")
                     .title("title " + i));
-            }
+        }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
@@ -197,9 +199,32 @@ public class RoutesActivity extends AppCompatActivity implements
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             assert mLastKnownLocation != null;
+                            LatLng[] latLngsNew = new LatLng[latLngs.length + 1];
+                            latLngsNew[0] = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            int i = 1;
+                            int j = 0;
+                            for (;i < latLngs.length + 1; i++) {
+                                latLngsNew[i]= latLngs[j++];
+                            }
+                            String urlNew = requestBuilder.buildUrl(latLngsNew);
 
+                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext);
+
+                            Object[] dataTransfer = new Object[4];
+
+                            dataTransfer[0] = mMap;
+                            dataTransfer[1] = urlNew;
+                            dataTransfer[2] = new LatLng(latLngs[0].latitude, latLngs[0].longitude);
+                            dataTransfer[3] = new LatLng(latLngs[countLatLngs - 1].latitude, latLngs[countLatLngs - 1].longitude);
+
+                            getDirectionsData.execute(dataTransfer);
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude());
+                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+
+
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -210,7 +235,7 @@ public class RoutesActivity extends AppCompatActivity implements
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -231,6 +256,7 @@ public class RoutesActivity extends AppCompatActivity implements
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -262,7 +288,7 @@ public class RoutesActivity extends AppCompatActivity implements
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
