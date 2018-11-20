@@ -2,9 +2,10 @@ package ua.tripguide.tripguideua.Utils;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import ua.tripguide.tripguideua.BuildConfig;
+
 public class RequestBuilder {
     private StringBuilder url;
-    private static final String GOOGLE_API_KEY = "";
 
     public String buildUrl(LatLng[] latLngs){
 
@@ -23,8 +24,8 @@ public class RequestBuilder {
                     }
             }
 
-            url.append("&mode=walking")
-                    .append("&key=" + GOOGLE_API_KEY)
+            url.append("&mode=TransitMode")
+                    .append("&key=" + BuildConfig.GoogleSecAPIKEY)
                     .append("&alternatives=false");
 
         }

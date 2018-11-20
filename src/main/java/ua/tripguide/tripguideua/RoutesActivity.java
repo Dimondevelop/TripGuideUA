@@ -5,16 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.location.places.GeoDataClient;
@@ -30,6 +35,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import ua.tripguide.tripguideua.Utils.GetDirectionsData;
@@ -64,7 +71,7 @@ public class RoutesActivity extends AppCompatActivity implements
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM = 17;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -79,9 +86,12 @@ public class RoutesActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
 
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(mContext);
@@ -148,6 +158,20 @@ public class RoutesActivity extends AppCompatActivity implements
         dataTransfer[3] = new LatLng(latLngs[countLatLngs - 1].latitude, latLngs[countLatLngs - 1].longitude);
 
         getDirectionsData.execute(dataTransfer);
+
+        mGeoDataClient.getPlaceById("ChIJW44MSqDP1EARB4igvLyiQDs").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+                if (task.isSuccessful()) {
+                    PlaceBufferResponse places = task.getResult();
+                    Place myPlace = places.get(0);
+                    Log.i(TAG, "Place found(aaaaa): " + myPlace.getName() + " " + myPlace.getLatLng().latitude + "," + myPlace.getLatLng().longitude);
+                    places.release();
+                } else {
+                    Log.e(TAG, "Place not found(ddddd).");
+                }
+            }
+        });
 
         for (int i = 0; i < latLngs.length; i++) {
             mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(workingHours[i])
@@ -311,6 +335,21 @@ public class RoutesActivity extends AppCompatActivity implements
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
+    }
+
+    //Стрілка назад
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if(id == R.id.action_settings){
+            return true;
+        } else if (id == android.R.id.home){
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
     static final String COLUMN_CITY_NAME = "name";
     static final String COLUMN_CITY_THUMBNAIL = "thumbmail";
 
-    //меню
-    MenuItem action_mail;
+//    //меню
+//    MenuItem action_mail;
 
     //об'єкти класу для роботи з бд
     DBHelper dbHelper;

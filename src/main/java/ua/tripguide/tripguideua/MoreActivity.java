@@ -41,7 +41,6 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         initImageLoader();

@@ -11,6 +11,7 @@ public class ObjectList {
     private String type_object;
     private String working_hours;
 
+
     public ObjectList(int id_object, String name_object, String thumbnail_object, float coordinate_x, float coordinate_y,
                       int _id_city_object, String object_description, String type_object, String working_hours) {
         this.id_object = id_object;
@@ -96,8 +97,6 @@ public class ObjectList {
         this.working_hours = working_hours;
     }
 
-//    @Override
-//    public String toString() {
-//        return  getCoordinate_x() + " " + getCoordinate_y();
-//    }
+
+
 }

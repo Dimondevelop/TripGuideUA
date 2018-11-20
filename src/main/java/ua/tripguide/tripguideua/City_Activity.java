@@ -66,6 +66,7 @@ public class City_Activity extends AppCompatActivity {
     createExcursion_.setOnClickListener(typeOfExcursionClickListener);
   }
 
+  //Стрілка назад
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -78,6 +79,5 @@ public class City_Activity extends AppCompatActivity {
     }
 
     return super.onOptionsItemSelected(item);
-
   }
 }

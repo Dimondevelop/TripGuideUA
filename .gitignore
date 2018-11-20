@@ -1,3 +1,4 @@
 /build
 /src/debug
 /src/release
+/src/main/res/values/strings.xml

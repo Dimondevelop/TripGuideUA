@@ -16,7 +16,7 @@
     <string name="working_hours">Графік роботи:</string>
     <string name="type_of">Тип:</string>
     <string name="on_map">на карті</string>
-    <string name="title_activity_routes">Map</string>
+    <string name="title_activity_routes">Прокледений маршрут</string>
     <string name="test">ТестГолоп</string>
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
     <string name="permission_required_toast">Location permission is required for this demo.</string>
