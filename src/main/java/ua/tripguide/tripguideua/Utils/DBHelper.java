@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import ua.tripguide.tripguideua.Models.City;
 import ua.tripguide.tripguideua.Models.ObjectList;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -21,11 +22,16 @@ public class DBHelper extends SQLiteOpenHelper {
     private static String DB_PATH; // Повний шлях до бази даних
     private static String DB_NAME = "MediaDB";
     private static final int VERSION = 1; // версія бази даних
-    public static final String TABLE_CITIES = "cities"; // назва таблиці з містами в бд
+    private static final String TABLE_CITIES = "cities"; // назва таблиці з містами в бд
     private static final String TABLE_OBJECTS = "objects"; // назва таблиці з містами в бд
 
+    // назви стовбців таблиці з містами
+    private static final String COLUMN_CITY_ID = "_id";
+    private static final String COLUMN_CITY_NAME = "name";
+    private static final String COLUMN_CITY_THUMBNAIL = "thumbmail";
+
     private static final String URL_THUMBNAIL_SERVER = "http://tripguideua.kl.com.ua/images/objects/";
-    // назви стовбців
+    // назви стовбців таблиці з об'єктами
     private static final String COLUMN_OBJECT_ID = "_id_object";
     private static final String COLUMN_OBJECT_NAME = "name_object";
     private static final String COLUMN_OBJECT_THUMBNAIL = "thumbnail_object";
@@ -35,7 +41,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_OBJECT_DESCRIPTION = "description_object";
     private static final String COLUMN_OBJECT_TYPE = "type_object";
     private static final String COLUMN_OBJECT_WORK_TIME = "working_hours";
-
 
     private Context myContext;
 
@@ -53,7 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public void create_db() {
+    private void create_db() {
         InputStream myInput;
         OutputStream myOutput;
         try {
@@ -84,12 +89,35 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public SQLiteDatabase open() throws SQLException {
+    private SQLiteDatabase open() throws SQLException {
         return SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
+    public ArrayList<City> getCitiesFromDB(){
+        // створюємо екземпляр бази данних
+        create_db();
+        // відкриваємо підключення
+        SQLiteDatabase db = open();
+        //отримуємо дані з бд у вигляді курсора
+        Cursor userCursor =  db.rawQuery("select * from "+ DBHelper.TABLE_CITIES, null);
+        ArrayList<City> lstCity = new ArrayList<>();
+        if (userCursor.moveToFirst()) {
+            int idIndex = userCursor.getColumnIndex(COLUMN_CITY_ID);
+            int nameIndex = userCursor.getColumnIndex(COLUMN_CITY_NAME);
+            int thumbnailIndex = userCursor.getColumnIndex(COLUMN_CITY_THUMBNAIL);
+            do {
+                lstCity.add(new City(userCursor.getInt(idIndex),userCursor.getString(nameIndex),userCursor.getString(thumbnailIndex)));
+            } while (userCursor.moveToNext());
+        }
+        // Закриваємо підключення і курсор
+        close();
+        db.close();
+        userCursor.close();
 
-    public ArrayList<ObjectList> getListOfObjects(int cityId) {
+        return lstCity;
+    }
+
+    public ArrayList<ObjectList> getObjectsFromDB(int cityId) {
         // создаем базу данных
         create_db();
         // открываем подключение

@@ -24,7 +24,8 @@ public class RequestBuilder {
                     }
             }
 
-            url.append("&mode=TransitMode")
+//            url.append("&mode=TransitMode")
+            url.append("&mode=walking")
                     .append("&key=" + BuildConfig.GoogleSecAPIKEY)
                     .append("&alternatives=false");
 
