@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class RequestBuilder {
     private StringBuilder url;
-    private static final String GOOGLE_API_KEY = "AIzaSyA-1OzdivurrFOMUPOYBV6QaKwMArDoR5I";
+    private static final String GOOGLE_API_KEY = "";
 
     public String buildUrl(LatLng[] latLngs){
 
