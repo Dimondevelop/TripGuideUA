@@ -105,9 +105,10 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                 for (String poliline:arrayList) {
                     PolylineOptions options = new PolylineOptions();
                     options.color(Color.BLUE);
-                    options.width(10);
+                    options.width(15);
                     options.startCap(new RoundCap());
-                    options.endCap(new SquareCap());
+                    options.endCap(new RoundCap());
+                    options.geodesic(true);
                     options.addAll(PolyUtil.decode(poliline));
 
                     mMap.addPolyline(options);

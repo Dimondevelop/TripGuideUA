@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -26,7 +27,8 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     float[] coordinates_x;
     float[] coordinates_y;
     String[] titles;
-    String[] workingHours;
+    String[] working_hours;
+    String[] place_ids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Оберіть об'єкти");
 
         //об'єкт класу для роботи з бд
         DBHelper dbHelper = new DBHelper(getApplicationContext());
@@ -63,13 +64,15 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                 coordinates_x = new float[countCheckedObjects];
                 coordinates_y = new float[countCheckedObjects];
                 titles = new String[countCheckedObjects];
-                workingHours = new String[countCheckedObjects];
+                working_hours = new String[countCheckedObjects];
+                place_ids = new String[countCheckedObjects];
 
                 for (int i = 0; i < countCheckedObjects; i++) {
                     coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
                     coordinates_y[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_y();
                     titles[i] = numbersAdapter.getCheckedObjects().get(i).getName_object();
-                    workingHours[i] = numbersAdapter.getCheckedObjects().get(i).getWorking_hours();
+                    working_hours[i] = numbersAdapter.getCheckedObjects().get(i).getWorking_hours();
+                    place_ids[i] = numbersAdapter.getCheckedObjects().get(i).getPlace_id();
                 }
 
                 Context vContext = v.getContext();
@@ -77,7 +80,8 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                 intent.putExtra("coordinates_x", coordinates_x);
                 intent.putExtra("coordinates_y", coordinates_y);
                 intent.putExtra("titles", titles);
-                intent.putExtra("workingHours", workingHours);
+                intent.putExtra("working_hours", working_hours);
+                intent.putExtra("place_ids", place_ids);
                 vContext.startActivity(intent);
             }
         });
@@ -86,20 +90,17 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     @Override
     public void onObjectClick(View view, int position) {
 
-        //DEBUG
+//                DEBUG
 //        int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
-//        coordinates_x = new float[countCheckedObjects];
-//        coordinates_y = new float[countCheckedObjects];
+//        place_ids = new String[countCheckedObjects];
 //
 //        for (int i = 0; i < countCheckedObjects; i++) {
-//            coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
-//            coordinates_y[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_y();
+//            place_ids[i] = numbersAdapter.getCheckedObjects().get(i).getPlace_id();
 //        }
 //
 //        StringBuilder string = new StringBuilder();
-//        for (int i = 0; i < coordinates_x.length; i++){
-//            string.append("\n LA: ").append(coordinates_x[i]);
-//            string.append(" RO: ").append(coordinates_y[i]);
+//        for (int i = 0; i < place_ids.length; i++){
+//            string.append("\n LA: ").append(place_ids[i]);
 //        }
 //        Toast toast = Toast.makeText(getApplicationContext(),
 //                string.toString(), Toast.LENGTH_SHORT);

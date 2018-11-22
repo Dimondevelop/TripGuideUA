@@ -1,6 +1,7 @@
 package ua.tripguide.tripguideua;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -45,8 +46,14 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         initImageLoader();
         super.onCreate(savedInstanceState);
-        Locale.setDefault(new Locale("uk_UA"));
-        // Retrieve the content view that renders the map.
+        String languageToLoad = "uk_UA";
+        Locale locale = new Locale(languageToLoad);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+
         setContentView(R.layout.activity_more);
 
 

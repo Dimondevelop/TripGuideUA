@@ -30,11 +30,13 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_CITY_NAME = "name";
     private static final String COLUMN_CITY_THUMBNAIL = "thumbmail";
 
-    private static final String URL_THUMBNAIL_SERVER = "http://tripguideua.kl.com.ua/images/objects/";
+    private static final String URL_THUMBNAIL_OBJECT_SERVER = "http://tripguideua.kl.com.ua/images/objects/";
+    private static final String URL_THUMBNAIL_CITIES_SERVER = "http://tripguideua.kl.com.ua/images/cities/";
     // назви стовбців таблиці з об'єктами
     private static final String COLUMN_OBJECT_ID = "_id_object";
     private static final String COLUMN_OBJECT_NAME = "name_object";
     private static final String COLUMN_OBJECT_THUMBNAIL = "thumbnail_object";
+    private static final String COLUMN_OBJECT_PLACE_ID = "place_id";
     private static final String COLUMN_OBJECT_COORDINATE_X = "coordinate_x";
     private static final String COLUMN_OBJECT_COORDINATE_Y = "coordinate_y";
     private static final String COLUMN_CITY_ID_OBJECT = "_id_city_object";
@@ -93,20 +95,22 @@ public class DBHelper extends SQLiteOpenHelper {
         return SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
-    public ArrayList<City> getCitiesFromDB(){
+    public ArrayList<City> getCitiesFromDB() {
         // створюємо екземпляр бази данних
         create_db();
         // відкриваємо підключення
         SQLiteDatabase db = open();
         //отримуємо дані з бд у вигляді курсора
-        Cursor userCursor =  db.rawQuery("select * from "+ DBHelper.TABLE_CITIES, null);
+        Cursor userCursor = db.rawQuery("select * from " + DBHelper.TABLE_CITIES, null);
         ArrayList<City> lstCity = new ArrayList<>();
         if (userCursor.moveToFirst()) {
             int idIndex = userCursor.getColumnIndex(COLUMN_CITY_ID);
             int nameIndex = userCursor.getColumnIndex(COLUMN_CITY_NAME);
             int thumbnailIndex = userCursor.getColumnIndex(COLUMN_CITY_THUMBNAIL);
             do {
-                lstCity.add(new City(userCursor.getInt(idIndex),userCursor.getString(nameIndex),userCursor.getString(thumbnailIndex)));
+                lstCity.add(new City(userCursor.getInt(idIndex),
+                        userCursor.getString(nameIndex),
+                        URL_THUMBNAIL_CITIES_SERVER + userCursor.getString(thumbnailIndex)));
             } while (userCursor.moveToNext());
         }
         // Закриваємо підключення і курсор
@@ -118,11 +122,11 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<ObjectList> getObjectsFromDB(int cityId) {
-        // создаем базу данных
+        // створюємо екземпляр бази данних
         create_db();
-        // открываем подключение
+        // відкриваємо підключення
         SQLiteDatabase db = open();
-        //получаем данные из бд в виде курсора
+        //отримуємо дані з бд у вигляді курсора
         Cursor userCursor = db.rawQuery("select * from " + TABLE_OBJECTS + " where " + COLUMN_CITY_ID_OBJECT + " = " + cityId, null);
 
         ArrayList<ObjectList> lstObjectList = new ArrayList<>();
@@ -131,6 +135,7 @@ public class DBHelper extends SQLiteOpenHelper {
             int idObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_ID);
             int nameObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_NAME);
             int thumbnailObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_THUMBNAIL);
+            int placeIdIndex = userCursor.getColumnIndex(COLUMN_OBJECT_PLACE_ID);
             int coordinateXIndex = userCursor.getColumnIndex(COLUMN_OBJECT_COORDINATE_X);
             int coordinateYIndex = userCursor.getColumnIndex(COLUMN_OBJECT_COORDINATE_Y);
             int idCityObjectIndex = userCursor.getColumnIndex(COLUMN_CITY_ID_OBJECT);
@@ -141,7 +146,8 @@ public class DBHelper extends SQLiteOpenHelper {
             do {
                 lstObjectList.add(new ObjectList(userCursor.getInt(idObjectIndex),
                         userCursor.getString(nameObjectIndex),
-                        URL_THUMBNAIL_SERVER + cityId + "/" + userCursor.getString(thumbnailObjectIndex),
+                        URL_THUMBNAIL_OBJECT_SERVER + cityId + "/" + userCursor.getString(thumbnailObjectIndex),
+                        userCursor.getString(placeIdIndex),
                         userCursor.getFloat(coordinateXIndex),
                         userCursor.getFloat(coordinateYIndex),
                         userCursor.getInt(idCityObjectIndex),

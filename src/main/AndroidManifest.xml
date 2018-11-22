@@ -35,7 +35,9 @@
             android:name=".City_Activity"
             android:screenOrientation="portrait" />
         <activity android:name=".ChooseIndividualActivity" />
-        <activity android:name=".CreateExcursionActivity" />
+        <activity android:name=".CreateExcursionActivity"
+            android:label="@string/choose_objects"
+            android:screenOrientation="portrait" />
         <activity android:name=".FromListActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

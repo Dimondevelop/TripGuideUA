@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -27,15 +26,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -53,6 +49,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
     private static final String TAG = RoutesActivity.class.getSimpleName();
     private GoogleMap mMap;
+    String placeName;
     private CameraPosition mCameraPosition;
 
     RequestBuilder requestBuilder;
@@ -82,13 +79,16 @@ public class RoutesActivity extends AppCompatActivity implements
     private LatLng[] latLngs;
     int countLatLngs;
     String[] titles;
-    String[] workingHours;
+    String[] working_hours;
+    String[] place_ids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
+
+        Locale.setDefault(new Locale("uk_UA"));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -105,8 +105,9 @@ public class RoutesActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         float[] coordinates_y = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_y");
         float[] coordinates_x = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_x");
-        titles =  Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
-        workingHours =  Objects.requireNonNull(intent.getExtras()).getStringArray("workingHours");
+        titles = Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
+        working_hours = Objects.requireNonNull(intent.getExtras()).getStringArray("working_hours");
+        place_ids = Objects.requireNonNull(intent.getExtras()).getStringArray("place_ids");
 
 
         if (coordinates_x != null && coordinates_y != null) {
@@ -158,28 +159,37 @@ public class RoutesActivity extends AppCompatActivity implements
         dataTransfer[3] = new LatLng(latLngs[countLatLngs - 1].latitude, latLngs[countLatLngs - 1].longitude);
 
         getDirectionsData.execute(dataTransfer);
+        final int countPlaceIds = place_ids.length;
 
-        mGeoDataClient.getPlaceById("ChIJW44MSqDP1EARB4igvLyiQDs").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+        mGeoDataClient.getPlaceById(place_ids).addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
             @Override
             public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
                 if (task.isSuccessful()) {
                     PlaceBufferResponse places = task.getResult();
-                    Place myPlace = places.get(0);
-                    Log.i(TAG, "Place found(aaaaa): " + myPlace.getName() + " " + myPlace.getLatLng().latitude + "," + myPlace.getLatLng().longitude);
+                    Place[] myPlace = new Place[countPlaceIds];
+                    for (int i = 0; i < countPlaceIds; i++) {
+                        myPlace[i] = places.get(i);
+
+                        Log.i(TAG, "Place found(debug): " + myPlace[i].getName() + " " + myPlace[i].getLatLng().latitude + "," + myPlace[i].getLatLng().longitude +
+                                " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
+                                + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
+                    }
+//                    for (int i = 0; i < latLngs.length; i++) {
+//                        mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
+//                                .title(myPlace[i].getName().toString()));
+//                    }
+
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
+
                     places.release();
                 } else {
-                    Log.e(TAG, "Place not found(ddddd).");
+                    Log.e(TAG, "Place not found.");
                 }
             }
         });
 
-        for (int i = 0; i < latLngs.length; i++) {
-            mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(workingHours[i])
-                    .title(titles[i]));
-        }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
     }
 
     /**
@@ -232,8 +242,8 @@ public class RoutesActivity extends AppCompatActivity implements
                             latLngsNew[0] = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             int i = 1;
                             int j = 0;
-                            for (;i < latLngs.length + 1; i++) {
-                                latLngsNew[i]= latLngs[j++];
+                            for (; i < latLngs.length + 1; i++) {
+                                latLngsNew[i] = latLngs[j++];
                             }
                             String urlNew = requestBuilder.buildUrl(latLngsNew);
 
@@ -266,6 +276,7 @@ public class RoutesActivity extends AppCompatActivity implements
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -343,9 +354,9 @@ public class RoutesActivity extends AppCompatActivity implements
 
         int id = item.getItemId();
 
-        if(id == R.id.action_settings){
+        if (id == R.id.action_settings) {
             return true;
-        } else if (id == android.R.id.home){
+        } else if (id == android.R.id.home) {
             finish();
         }
 

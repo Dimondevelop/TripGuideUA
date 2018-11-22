@@ -4,6 +4,7 @@ public class ObjectList {
     private int id_object;
     private String name_object;
     private String thumbnail_object;
+    private String place_id;
     private float coordinate_x;
     private float coordinate_y;
     private int _id_city_object;
@@ -12,11 +13,12 @@ public class ObjectList {
     private String working_hours;
 
 
-    public ObjectList(int id_object, String name_object, String thumbnail_object, float coordinate_x, float coordinate_y,
+    public ObjectList(int id_object, String name_object, String thumbnail_object, String place_id, float coordinate_x, float coordinate_y,
                       int _id_city_object, String object_description, String type_object, String working_hours) {
         this.id_object = id_object;
         this.name_object = name_object;
         this.thumbnail_object = thumbnail_object;
+        this.place_id = place_id;
         this.coordinate_x = coordinate_x;
         this.coordinate_y = coordinate_y;
         this._id_city_object = _id_city_object;
@@ -47,6 +49,14 @@ public class ObjectList {
 
     public void setThumbnail_object(String thumbnail_object) {
         this.thumbnail_object = thumbnail_object;
+    }
+
+    public String getPlace_id() {
+        return place_id;
+    }
+
+    public void setPlace_id(String place_id) {
+        this.place_id = place_id;
     }
 
     public float getCoordinate_x() {
