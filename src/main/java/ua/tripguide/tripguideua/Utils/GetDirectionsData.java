@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -79,6 +78,14 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
         try {
             JSONObject jsonObjectResponse = new JSONObject(s);
+            JSONArray jsonArrayGeocodedWaypoints = jsonObjectResponse.getJSONArray("geocoded_waypoints");
+
+            int countWaypoints = jsonArrayGeocodedWaypoints.length();
+            String[] placeIds = new String[countWaypoints];
+            for (int i = 0; i < countWaypoints; i++){
+                placeIds[i] =  jsonArrayGeocodedWaypoints.getJSONObject(i).getString("place_id");
+            }
+
             JSONArray jsonArrayRoutes = jsonObjectResponse.getJSONArray("routes");
 
             JSONArray jsonArrayLegs = jsonArrayRoutes.getJSONObject(0).getJSONArray("legs");
@@ -87,13 +94,17 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
             ArrayList<ArrayList<String>> arrayListLegs = new ArrayList<>();
             ArrayList<String> arrayListSteps = new ArrayList<>();
 
-            JSONArray[] jsonArraySteps = new  JSONArray[countJsonArrayLegs];
+
+            LatLng[] latLngsWaypoints = new LatLng[countJsonArrayLegs];
+            JSONArray[] jsonArraySteps = new JSONArray[countJsonArrayLegs];
+
             JSONObject jsonObjectInSteps;
             for (int i = 0; i < countJsonArrayLegs; i++) {
-                jsonArraySteps[i] = jsonArrayLegs.getJSONObject(i).getJSONArray("steps");
-                int count_jsonArray = jsonArraySteps[i].length();
+                latLngsWaypoints[i] = new LatLng(Float.valueOf(jsonArrayLegs.getJSONObject(i).getJSONObject("start_location").getString("lat")),
+                                                Float.valueOf(jsonArrayLegs.getJSONObject(i).getJSONObject("start_location").getString("lng")));
 
-                for (int j = 0; j < count_jsonArray; j++){
+                jsonArraySteps[i] = jsonArrayLegs.getJSONObject(i).getJSONArray("steps");
+                for (int j = 0; j < jsonArraySteps[i].length(); j++) {
                     jsonObjectInSteps = jsonArraySteps[i].getJSONObject(j);
 
                     String polygone = jsonObjectInSteps.getJSONObject("polyline").getString("points");
@@ -108,21 +119,20 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
             int countPoints;
             int height = 15;
             int width = 15;
-            BitmapDrawable bitmapdraw_small=(BitmapDrawable) c.getResources().getDrawable(R.drawable.circle_small_white);
-            Bitmap b_small=bitmapdraw_small.getBitmap();
-            Bitmap smallMarker = Bitmap.createScaledBitmap(b_small, width, height, false);
+            BitmapDrawable bitmapdraw = (BitmapDrawable) c.getResources().getDrawable(R.drawable.circle_small_white);
+            Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
+            bitmapdraw = (BitmapDrawable) c.getResources().getDrawable(R.drawable.circle_middle_bagel);
+            Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2, height * 2, false);
+            bitmapdraw = (BitmapDrawable) c.getResources().getDrawable(R.drawable.circle_middle_black);
+            Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2+8, height * 2+8, false);
 
-            BitmapDrawable bitmapdraw=(BitmapDrawable) c.getResources().getDrawable(R.drawable.circle_middle_black);
-            Bitmap b_middle=bitmapdraw.getBitmap();
-            Bitmap middleMarker = Bitmap.createScaledBitmap(b_middle, width*3, height*3, false);
-
-
+            int i = 0;
             ArrayList<LatLng> latLngs = new ArrayList<>();
-            for (ArrayList<String> arrayList:arrayListLegs) {
-                for (String poliline:arrayList) {
+            for (ArrayList<String> arrayList : arrayListLegs) {
+                for (String poliline : arrayList) {
                     PolylineOptions options = new PolylineOptions();
                     options.color(Color.BLUE);
-                    options.width(15);
+                    options.width(width);
                     options.startCap(new RoundCap());
                     options.endCap(new RoundCap());
                     options.geodesic(true);
@@ -130,19 +140,23 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
                     countPoints = options.getPoints().size();
                     LatLng latLngStart = options.getPoints().get(0);
-                    LatLng latLngFinish = options.getPoints().get(countPoints-1);
+                    LatLng latLngFinish = options.getPoints().get(countPoints - 1);
                     latLngs.add(latLngStart);
                     latLngs.add(latLngFinish);
 
-                    if (!poliline.equals(arrayList.get(0))){
+                    if (!poliline.equals(arrayList.get(0))) {
                         mMap.addMarker(new MarkerOptions().position(latLngStart).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)).snippet(String.valueOf(countPoints))
                                 .title(latLngStart.latitude + " " + latLngStart.longitude));
                     }
                     mMap.addPolyline(options);
                 }
+//                if (i != 0){
+//                    mMap.addMarker(new MarkerOptions().position(latLngsWaypoints[i]).title(latLngsWaypoints[i].latitude + " " + latLngsWaypoints[i].longitude));
+//                }
+//                i++;
             }
-            mMap.addMarker(new MarkerOptions().position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarker)).anchor(0.5f,0.5f));
-            mMap.addMarker(new MarkerOptions().position(latLngs.get(latLngs.size()-1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarker)).anchor(0.5f,0.5f));
+            mMap.addMarker(new MarkerOptions().position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)).anchor(0.5f, 0.5f));
+            mMap.addMarker(new MarkerOptions().position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)).anchor(0.5f, 0.5f));
 
         } catch (JSONException e) {
             e.printStackTrace();

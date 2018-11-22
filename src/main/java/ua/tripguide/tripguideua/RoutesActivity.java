@@ -174,10 +174,10 @@ public class RoutesActivity extends AppCompatActivity implements
                                 " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
                                 + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
                     }
-//                    for (int i = 0; i < latLngs.length; i++) {
-//                        mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
-//                                .title(myPlace[i].getName().toString()));
-//                    }
+                    for (int i = 0; i < latLngs.length; i++) {
+                        mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
+                                .title(myPlace[i].getName().toString()));
+                    }
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
