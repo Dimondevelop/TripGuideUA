@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -174,9 +177,12 @@ public class RoutesActivity extends AppCompatActivity implements
                                 " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
                                 + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
                     }
+
+                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.circle_small_white);
+                    Bitmap waypointMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), 30, 30, false);
                     for (int i = 0; i < latLngs.length; i++) {
                         mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
-                                .title(myPlace[i].getName().toString()));
+                                .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
                     }
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
