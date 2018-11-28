@@ -133,6 +133,49 @@ public class RoutesActivity extends AppCompatActivity implements
         }
     }
 
+    private LatLng[] doubleSort(LatLng[] latLngs){
+        latLngs = sortLatLng(latLngs);
+
+        LatLng temp_before = latLngs[0];
+        latLngs[0] = latLngs[latLngs.length-1];
+        latLngs[latLngs.length-1] = temp_before;
+
+        latLngs = sortLatLng(latLngs);
+
+        LatLng temp_after = latLngs[0];
+        latLngs[0] = latLngs[latLngs.length-1];
+        latLngs[latLngs.length-1] = temp_after;
+
+        return latLngs;
+    }
+
+    private LatLng[] sortLatLng(LatLng[] latLngs) {
+        int count = latLngs.length;
+        int index = 1;
+
+        double[] distances = new double[count - 1];
+
+
+//        AB = √(xb - xa)**2 + (yb - ya)**2 - формула дистанції
+        for (int i = 0; i < count - 1; i++) {
+            distances[i] = Math.sqrt(Math.pow(latLngs[0].latitude - latLngs[i + 1].latitude, 2) + Math.pow(latLngs[0].longitude - latLngs[i + 1].longitude, 2));
+        }
+
+        double temp = distances[0];
+        for (int i = 1; i < count-1; i++) {
+            if (temp < distances[i]) {
+                temp = distances[i];
+                index = i + 1;
+            }
+        }
+
+        LatLng tempLatLng = latLngs[count-1];
+        latLngs[count-1] = latLngs[index];
+        latLngs[index] = tempLatLng;
+
+        return latLngs;
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -151,6 +194,7 @@ public class RoutesActivity extends AppCompatActivity implements
         enableMyLocation();
 
         requestBuilder = new RequestBuilder();
+        latLngs = doubleSort(latLngs);
         String url = requestBuilder.buildUrl(latLngs);
 
         Object[] dataTransfer = new Object[4];
@@ -172,15 +216,15 @@ public class RoutesActivity extends AppCompatActivity implements
                     Place[] myPlace = new Place[countPlaceIds];
                     for (int i = 0; i < countPlaceIds; i++) {
                         myPlace[i] = places.get(i);
-
-                        Log.i(TAG, "Place found(debug): " + myPlace[i].getName() + " " + myPlace[i].getLatLng().latitude + "," + myPlace[i].getLatLng().longitude +
-                                " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
-                                + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
+ // DEBUG
+//                        Log.i(TAG, "Place found(debug): " + myPlace[i].getName() + " " + myPlace[i].getLatLng().latitude + "," + myPlace[i].getLatLng().longitude +
+//                                " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
+//                                + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
                     }
 
                     BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.circle_small_white);
                     Bitmap waypointMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), 30, 30, false);
-                    for (int i = 0; i < latLngs.length; i++) {
+                    for (int i = 0; i < latLngs.length-1; i++) {
                         mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
                                 .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
                     }
@@ -188,6 +232,7 @@ public class RoutesActivity extends AppCompatActivity implements
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
 
+                    assert places != null;
                     places.release();
                 } else {
                     Log.e(TAG, "Place not found.");
@@ -251,8 +296,10 @@ public class RoutesActivity extends AppCompatActivity implements
                             for (; i < latLngs.length + 1; i++) {
                                 latLngsNew[i] = latLngs[j++];
                             }
+                            latLngsNew = sortLatLng(latLngsNew);
                             String urlNew = requestBuilder.buildUrl(latLngsNew);
 
+                            mMap.clear();
                             GetDirectionsData getDirectionsData = new GetDirectionsData(mContext);
 
                             Object[] dataTransfer = new Object[4];

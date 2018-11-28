@@ -10,6 +10,7 @@ import android.text.Html;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
@@ -83,8 +84,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
             int countWaypoints = jsonArrayGeocodedWaypoints.length();
             String[] placeIds = new String[countWaypoints];
-            for (int i = 0; i < countWaypoints; i++){
-                placeIds[i] =  jsonArrayGeocodedWaypoints.getJSONObject(i).getString("place_id");
+            for (int i = 0; i < countWaypoints; i++) {
+                placeIds[i] = jsonArrayGeocodedWaypoints.getJSONObject(i).getString("place_id");
             }
 
             JSONArray jsonArrayRoutes = jsonObjectResponse.getJSONArray("routes");
@@ -101,7 +102,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
             JSONObject jsonObjectInSteps;
             for (int i = 0; i < countJsonArrayLegs; i++) {
                 latLngsWaypoints[i] = new LatLng(Float.valueOf(jsonArrayLegs.getJSONObject(i).getJSONObject("start_location").getString("lat")),
-                                                Float.valueOf(jsonArrayLegs.getJSONObject(i).getJSONObject("start_location").getString("lng")));
+                        Float.valueOf(jsonArrayLegs.getJSONObject(i).getJSONObject("start_location").getString("lng")));
 
                 jsonArraySteps[i] = jsonArrayLegs.getJSONObject(i).getJSONArray("steps");
                 for (int j = 0; j < jsonArraySteps[i].length(); j++) {
@@ -110,8 +111,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     String polygone = jsonObjectInSteps.getJSONObject("polyline").getString("points");
                     String html_instructions = jsonObjectInSteps.getString("html_instructions");
 
-
-                    arrayListSteps.add(new String[]{polygone,html_instructions});
+                    arrayListSteps.add(new String[]{polygone, html_instructions});
                 }
                 arrayListSteps = new ArrayList<>(arrayListSteps);
                 arrayListLegs.add(arrayListSteps);
@@ -124,11 +124,11 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
             BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_small_white2);
             Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
 
-//            bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_middle_bagel);
-//            Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2, height * 2, false);
+            bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_middle_bagel);
+            Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2, height * 2, false);
 
             bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_middle_black);
-            Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2+12, height * 2+12, false);
+            Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2 + 12, height * 2 + 12, false);
 
             int i = 0;
             ArrayList<LatLng> latLngs = new ArrayList<>();
@@ -136,7 +136,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                 for (String[] poliline : arrayList) {
                     PolylineOptions options = new PolylineOptions();
                     options.color(Color.BLACK);
-                    options.width(width+12);
+                    options.width(width + 12);
                     options.startCap(new RoundCap());
                     options.endCap(new RoundCap());
                     options.geodesic(true);
@@ -148,24 +148,21 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     latLngs.add(latLngStart);
                     latLngs.add(latLngFinish);
 
-                    if (!poliline.equals(arrayList.get(0))) {
-                        mMap.addMarker(new MarkerOptions().position(latLngStart).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)).snippet(String.valueOf(countPoints))
+                    mMap.addMarker(new MarkerOptions().position(latLngStart).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)).snippet(String.valueOf(countPoints))
                                 .title(Html.fromHtml(poliline[1]).toString()));
-                    }
+
                     mMap.addPolyline(options);
-                    options.width(width+8);
+                    options.width(width + 8);
                     options.zIndex(3);
                     options.startCap(new RoundCap());
                     options.endCap(new RoundCap());
-                    options.color(Color.rgb(0,179,253));
+                    options.color(Color.rgb(0, 179, 253));
                     mMap.addPolyline(options);
+                    i++;
                 }
-//                if (i != 0){
-//                    mMap.addMarker(new MarkerOptions().position(latLngsWaypoints[i]).title(latLngsWaypoints[i].latitude + " " + latLngsWaypoints[i].longitude));
-//                }
-//                i++;
+
             }
-//            mMap.addMarker(new MarkerOptions().position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)).anchor(0.5f, 0.5f));
+            mMap.addMarker(new MarkerOptions().position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)).anchor(0.5f, 0.5f));
             mMap.addMarker(new MarkerOptions().position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)).anchor(0.5f, 0.5f));
 
         } catch (JSONException e) {
