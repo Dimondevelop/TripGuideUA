@@ -2,23 +2,28 @@ package ua.tripguide.tripguideua.Utils;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 import ua.tripguide.tripguideua.BuildConfig;
+import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 
 public class RequestBuilder {
     private StringBuilder url;
 
-    public String buildUrl(LatLng[] latLngs) {
+    public String buildUrl(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
         
-        if (latLngs != null) {
-            int countLatLngs = latLngs.length;
+        if (routeObjectsInfoList != null) {
+            int size = routeObjectsInfoList.size();
             url = new StringBuilder()
                     .append("https://maps.googleapis.com/maps/api/directions/json?")
-                    .append("origin=").append(latLngs[0].latitude).append(",").append(latLngs[0].longitude)
-                    .append("&destination=").append(latLngs[countLatLngs - 1].latitude).append(",").append(latLngs[countLatLngs - 1].longitude);
-            if (countLatLngs > 2) {
+                    .append("origin=").append(routeObjectsInfoList.get(0).getLatLng().latitude).append(",").append(routeObjectsInfoList.get(0).getLatLng().longitude)
+                    .append("&destination=").append(routeObjectsInfoList.get(size - 1).getLatLng().latitude).append(",").append(routeObjectsInfoList.get(size - 1).getLatLng().longitude);
+            if (size > 2) {
                 url.append("&waypoints=optimize:true");
-                for (int i = 0; i < countLatLngs - 1; i++) {
-                    url.append("|").append(latLngs[i].latitude).append(",").append(latLngs[i].longitude);
+                for (int i = 0; i < size - 1; i++) {
+                    url.append("|").append(routeObjectsInfoList.get(i).getLatLng().latitude).append(",").append(routeObjectsInfoList.get(i).getLatLng().longitude);
                 }
             }
 //            url.append("&mode=TransitMode")

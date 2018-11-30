@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -18,36 +16,37 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.Utils.GetDirectionsData;
 import ua.tripguide.tripguideua.Utils.PermissionUtils;
 import ua.tripguide.tripguideua.Utils.RequestBuilder;
-
+import ua.tripguide.tripguideua.Utils.PopupAdapter;
 
 public class RoutesActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnInfoWindowClickListener {
 
 
     private static final String TAG = RoutesActivity.class.getSimpleName();
@@ -81,9 +80,12 @@ public class RoutesActivity extends AppCompatActivity implements
 
     private LatLng[] latLngs;
     int countLatLngs;
+    String[] place_ids;
     String[] titles;
     String[] working_hours;
-    String[] place_ids;
+
+    ArrayList<RouteObjectsInfo> lstRouteObjectsInfos = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,9 +110,9 @@ public class RoutesActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         float[] coordinates_y = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_y");
         float[] coordinates_x = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_x");
+        place_ids = Objects.requireNonNull(intent.getExtras()).getStringArray("place_ids");
         titles = Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
         working_hours = Objects.requireNonNull(intent.getExtras()).getStringArray("working_hours");
-        place_ids = Objects.requireNonNull(intent.getExtras()).getStringArray("place_ids");
 
 
         if (coordinates_x != null && coordinates_y != null) {
@@ -119,6 +121,10 @@ public class RoutesActivity extends AppCompatActivity implements
             for (int i = 0; i < countLatLngs; i++) {
                 latLngs[i] = new LatLng(coordinates_x[i], coordinates_y[i]);
             }
+        }
+
+        for (int i = 0; i < countLatLngs; i++) {
+            lstRouteObjectsInfos.add(new RouteObjectsInfo(place_ids[i], titles[i], Objects.requireNonNull(working_hours)[i], latLngs[i]));
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -133,47 +139,62 @@ public class RoutesActivity extends AppCompatActivity implements
         }
     }
 
-    private LatLng[] doubleSort(LatLng[] latLngs){
-        latLngs = sortLatLng(latLngs);
-
-        LatLng temp_before = latLngs[0];
-        latLngs[0] = latLngs[latLngs.length-1];
-        latLngs[latLngs.length-1] = temp_before;
-
-        latLngs = sortLatLng(latLngs);
-
-        LatLng temp_after = latLngs[0];
-        latLngs[0] = latLngs[latLngs.length-1];
-        latLngs[latLngs.length-1] = temp_after;
-
-        return latLngs;
-    }
-
-    private LatLng[] sortLatLng(LatLng[] latLngs) {
+    private ArrayList<RouteObjectsInfo> sortLatLng(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
         int count = latLngs.length;
         int index = 1;
-
         double[] distances = new double[count - 1];
-
 
 //        AB = √(xb - xa)**2 + (yb - ya)**2 - формула дистанції
         for (int i = 0; i < count - 1; i++) {
-            distances[i] = Math.sqrt(Math.pow(latLngs[0].latitude - latLngs[i + 1].latitude, 2) + Math.pow(latLngs[0].longitude - latLngs[i + 1].longitude, 2));
+            distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
+                    + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));
         }
 
         double temp = distances[0];
-        for (int i = 1; i < count-1; i++) {
+        for (int i = 1; i < count - 1; i++) {
             if (temp < distances[i]) {
                 temp = distances[i];
                 index = i + 1;
             }
         }
 
-        LatLng tempLatLng = latLngs[count-1];
-        latLngs[count-1] = latLngs[index];
-        latLngs[index] = tempLatLng;
+        RouteObjectsInfo tempROI = new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
+                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getLatLng());
 
-        return latLngs;
+        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(routeObjectsInfoList.get(index).getPlace_id(), routeObjectsInfoList.get(index).getTitle(),
+                routeObjectsInfoList.get(index).getWorking_hour(), routeObjectsInfoList.get(index).getLatLng()));
+
+        routeObjectsInfoList.set(index, new RouteObjectsInfo(tempROI.getPlace_id(), tempROI.getTitle(), tempROI.getWorking_hour(), tempROI.getLatLng()));
+
+        return routeObjectsInfoList;
+    }
+
+    private ArrayList<RouteObjectsInfo> doubleSort(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
+
+        int count = routeObjectsInfoList.size();
+
+        routeObjectsInfoList = new ArrayList<>(sortLatLng(routeObjectsInfoList));
+
+        RouteObjectsInfo temp_before = new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
+                routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getLatLng());
+
+        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
+                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getLatLng()));
+
+        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(temp_before.getPlace_id(), temp_before.getTitle(), temp_before.getWorking_hour(), temp_before.getLatLng()));
+
+        routeObjectsInfoList = new ArrayList<>(sortLatLng(routeObjectsInfoList));
+
+        RouteObjectsInfo temp_after =  new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
+                routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getLatLng());
+
+        routeObjectsInfoList.get(0).setPlace_id(routeObjectsInfoList.get(count - 1).getPlace_id());
+        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(),routeObjectsInfoList.get(count - 1).getTitle(),
+                routeObjectsInfoList.get(count - 1).getWorking_hour(),routeObjectsInfoList.get(count - 1).getLatLng()));
+
+        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getLatLng()));
+
+        return routeObjectsInfoList;
     }
 
     /**
@@ -191,55 +212,24 @@ public class RoutesActivity extends AppCompatActivity implements
 
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
         enableMyLocation();
 
         requestBuilder = new RequestBuilder();
-        latLngs = doubleSort(latLngs);
-        String url = requestBuilder.buildUrl(latLngs);
+        lstRouteObjectsInfos = new ArrayList<>(doubleSort(lstRouteObjectsInfos));
+        String url = requestBuilder.buildUrl(lstRouteObjectsInfos);
 
-        Object[] dataTransfer = new Object[4];
+        Object[] dataTransfer = new Object[2];
 
-        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext);
+        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos);
         dataTransfer[0] = mMap;
         dataTransfer[1] = url;
-        dataTransfer[2] = new LatLng(latLngs[0].latitude, latLngs[0].longitude);
-        dataTransfer[3] = new LatLng(latLngs[countLatLngs - 1].latitude, latLngs[countLatLngs - 1].longitude);
 
         getDirectionsData.execute(dataTransfer);
-        final int countPlaceIds = place_ids.length;
 
-        mGeoDataClient.getPlaceById(place_ids).addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
-            @Override
-            public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
-                if (task.isSuccessful()) {
-                    PlaceBufferResponse places = task.getResult();
-                    Place[] myPlace = new Place[countPlaceIds];
-                    for (int i = 0; i < countPlaceIds; i++) {
-                        myPlace[i] = places.get(i);
- // DEBUG
-//                        Log.i(TAG, "Place found(debug): " + myPlace[i].getName() + " " + myPlace[i].getLatLng().latitude + "," + myPlace[i].getLatLng().longitude +
-//                                " | \n" + myPlace[i].getAddress() + " |  " + myPlace[i].getAttributions() + " |  " + myPlace[i].getLocale() + " |  "
-//                                + myPlace[i].getPlaceTypes() + " |  " + myPlace[i].getPriceLevel() + " |  " + myPlace[i].getPhoneNumber());
-                    }
-
-                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.circle_small_white);
-                    Bitmap waypointMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), 30, 30, false);
-                    for (int i = 0; i < latLngs.length-1; i++) {
-                        mMap.addMarker(new MarkerOptions().position(latLngs[i]).snippet(working_hours[i])
-                                .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
-                    }
-
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngs[0]));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs[0], DEFAULT_ZOOM), 50, null);
-
-                    assert places != null;
-                    places.release();
-                } else {
-                    Log.e(TAG, "Place not found.");
-                }
-            }
-        });
-
+        mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(lstRouteObjectsInfos.get(0).getLatLng()));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lstRouteObjectsInfos.get(0).getLatLng(), DEFAULT_ZOOM), 50, null);
 
     }
 
@@ -289,25 +279,20 @@ public class RoutesActivity extends AppCompatActivity implements
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             assert mLastKnownLocation != null;
-                            LatLng[] latLngsNew = new LatLng[latLngs.length + 1];
-                            latLngsNew[0] = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            int i = 1;
-                            int j = 0;
-                            for (; i < latLngs.length + 1; i++) {
-                                latLngsNew[i] = latLngs[j++];
-                            }
-                            latLngsNew = sortLatLng(latLngsNew);
-                            String urlNew = requestBuilder.buildUrl(latLngsNew);
+
+                            lstRouteObjectsInfos.add(0, new RouteObjectsInfo("ChIJ7T8OhbOz0EARtk962u0zNPM", "Моє місцезнаходження", "",
+                                    new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+
+                            lstRouteObjectsInfos = new ArrayList<>(sortLatLng(lstRouteObjectsInfos));
+                            String urlNew = requestBuilder.buildUrl(lstRouteObjectsInfos);
 
                             mMap.clear();
-                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext);
+                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos);
 
                             Object[] dataTransfer = new Object[4];
 
                             dataTransfer[0] = mMap;
                             dataTransfer[1] = urlNew;
-                            dataTransfer[2] = new LatLng(latLngs[0].latitude, latLngs[0].longitude);
-                            dataTransfer[3] = new LatLng(latLngs[countLatLngs - 1].latitude, latLngs[countLatLngs - 1].longitude);
 
                             getDirectionsData.execute(dataTransfer);
 
@@ -416,4 +401,8 @@ public class RoutesActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
 }
