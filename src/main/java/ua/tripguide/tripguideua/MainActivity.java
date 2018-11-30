@@ -11,6 +11,7 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Objects;
 
+import ua.tripguide.tripguideua.Adapters.RecyclerViewAdapter;
 import ua.tripguide.tripguideua.Models.City;
 import ua.tripguide.tripguideua.Utils.DBHelper;
 

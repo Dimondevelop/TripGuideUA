@@ -1,4 +1,4 @@
-package ua.tripguide.tripguideua;
+package ua.tripguide.tripguideua.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ua.tripguide.tripguideua.Models.ObjectList;
+import ua.tripguide.tripguideua.MoreActivity;
+import ua.tripguide.tripguideua.R;
 
 public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberViewHolder> {
 
@@ -26,21 +27,21 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     private TextView tvTypeList;
     private boolean flag = false;
 
-    boolean isFlag() {
+    public boolean isFlag() {
         return flag;
     }
 
-    ArrayList<ObjectList> getCheckedObjects() {
+    public ArrayList<ObjectList> getCheckedObjects() {
         return CheckedObjects;
     }
 
-    interface OnObjectClickListener {
+    public interface OnObjectClickListener {
         void onObjectClick(View view, int position);
     }
 
     private OnObjectClickListener mListener;
 
-    NumbersAdapter(Context mContextObj, List<ObjectList> mDataObjectList) {
+    public NumbersAdapter(Context mContextObj, List<ObjectList> mDataObjectList) {
         this.mContextObj = mContextObj;
         this.mDataObjectList = mDataObjectList;
     }
@@ -79,7 +80,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     }
 
     // метод-сеттер для прив'язки колбека до отримувача подій
-    void setOnObjectClickListener(OnObjectClickListener listener) {
+    public void setOnObjectClickListener(OnObjectClickListener listener) {
         mListener = listener;
     }
 

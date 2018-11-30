@@ -1,4 +1,4 @@
-package ua.tripguide.tripguideua;
+package ua.tripguide.tripguideua.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,7 +16,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
 
+import ua.tripguide.tripguideua.City_Activity;
 import ua.tripguide.tripguideua.Models.City;
+import ua.tripguide.tripguideua.R;
 import ua.tripguide.tripguideua.Utils.UniversalImageLoader;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapter.MyViewHolder>{
@@ -26,7 +28,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
     private int itemCount;
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
-    RecyclerViewAdapter(int itemCount, Context mContext, List<City> mData) {
+    public RecyclerViewAdapter(int itemCount, Context mContext, List<City> mData) {
         this.mContext = mContext;
         this.mData = mData;
         this.itemCount = itemCount;
