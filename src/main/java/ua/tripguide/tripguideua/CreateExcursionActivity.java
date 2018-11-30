@@ -52,7 +52,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv_numbers.setLayoutManager(layoutManager);
         rv_numbers.setHasFixedSize(true);
-        numbersAdapter = new NumbersAdapter(lstObjectList.size(), this, lstObjectList);
+        numbersAdapter = new NumbersAdapter( this, lstObjectList);
         numbersAdapter.setOnObjectClickListener(this);
         rv_numbers.setAdapter(numbersAdapter);
 

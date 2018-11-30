@@ -2,13 +2,16 @@ package ua.tripguide.tripguideua;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -16,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,16 +47,17 @@ import ua.tripguide.tripguideua.Utils.PermissionUtils;
 import ua.tripguide.tripguideua.Utils.RequestBuilder;
 import ua.tripguide.tripguideua.Utils.PopupAdapter;
 
+import static android.support.constraint.Constraints.TAG;
+
 public class RoutesActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnInfoWindowClickListener {
 
-
     private static final String TAG = RoutesActivity.class.getSimpleName();
     private GoogleMap mMap;
-    String placeName;
+    LocationManager manager;
     private CameraPosition mCameraPosition;
 
     RequestBuilder requestBuilder;
@@ -77,7 +83,6 @@ public class RoutesActivity extends AppCompatActivity implements
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
 
-
     private LatLng[] latLngs;
     int countLatLngs;
     String[] place_ids;
@@ -85,7 +90,6 @@ public class RoutesActivity extends AppCompatActivity implements
     String[] working_hours;
 
     ArrayList<RouteObjectsInfo> lstRouteObjectsInfos = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +117,6 @@ public class RoutesActivity extends AppCompatActivity implements
         place_ids = Objects.requireNonNull(intent.getExtras()).getStringArray("place_ids");
         titles = Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
         working_hours = Objects.requireNonNull(intent.getExtras()).getStringArray("working_hours");
-
 
         if (coordinates_x != null && coordinates_y != null) {
             countLatLngs = coordinates_x.length;
@@ -185,12 +188,12 @@ public class RoutesActivity extends AppCompatActivity implements
 
         routeObjectsInfoList = new ArrayList<>(sortLatLng(routeObjectsInfoList));
 
-        RouteObjectsInfo temp_after =  new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
+        RouteObjectsInfo temp_after = new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
                 routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getLatLng());
 
         routeObjectsInfoList.get(0).setPlace_id(routeObjectsInfoList.get(count - 1).getPlace_id());
-        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(),routeObjectsInfoList.get(count - 1).getTitle(),
-                routeObjectsInfoList.get(count - 1).getWorking_hour(),routeObjectsInfoList.get(count - 1).getLatLng()));
+        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
+                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getLatLng()));
 
         routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getLatLng()));
 
@@ -227,10 +230,30 @@ public class RoutesActivity extends AppCompatActivity implements
 
         getDirectionsData.execute(dataTransfer);
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DEBUG|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+//        mGeoDataClient.getPlaceById("ChIJh3nXWpQINEcROf2jJEnPXY0").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+//            @Override
+//            public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+//                if (task.isSuccessful()) {
+//                    PlaceBufferResponse places = task.getResult();
+//                    Place myPlace;
+//                    myPlace = places.get(0);
+//                    // DEBUG
+//                    Log.i(TAG, "Place found(debug): " + myPlace.getName() + " " + myPlace.getLatLng().latitude + "," + myPlace.getLatLng().longitude +
+//                            " | \n" + myPlace.getAddress() + " |  " + myPlace.getAttributions() + " |  " + myPlace.getLocale() + " |  "
+//                            + myPlace.getPlaceTypes() + " |  " + myPlace.getPriceLevel() + " |  " + myPlace.getPhoneNumber());
+//                    assert places != null;
+//                    places.release();
+//                } else {
+//                    Log.e(TAG, "Place not found.");
+//                }
+//            }
+//        });
+//|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
         mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(lstRouteObjectsInfos.get(0).getLatLng()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lstRouteObjectsInfos.get(0).getLatLng(), DEFAULT_ZOOM), 50, null);
-
     }
 
     /**
@@ -248,9 +271,46 @@ public class RoutesActivity extends AppCompatActivity implements
         }
     }
 
+    public boolean isGeoDisabled() {
+        LocationManager mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        boolean mIsGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean mIsNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean mIsGeoDisabled = !mIsGPSEnabled && !mIsNetworkEnabled;
+        return mIsGeoDisabled;
+    }
+
+    private boolean buildAlertMessageNoLocationService(boolean network_enabled) {
+        String msg = !network_enabled ? ("Для визначення місцезнаходження потрібно увімкнути місцезнаходження") : null;
+
+        if (msg != null) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true)
+                    .setMessage(msg).setNegativeButton("скасувати", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            })
+                    .setPositiveButton("увімкнути", new DialogInterface.OnClickListener() {
+                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean onMyLocationButtonClick() {
-        getDeviceLocation();
+        manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            getDeviceLocation();
+        } else {
+            buildAlertMessageNoLocationService(!isGeoDisabled());
+        }
+
 
 //        Toast.makeText(this, "MyLocation button clicked ", Toast.LENGTH_SHORT).show();
 //        // Return false so that we don't consume the event and the default behavior still occurs
@@ -260,7 +320,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Мої кординати: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
     }
 
     private void getDeviceLocation() {

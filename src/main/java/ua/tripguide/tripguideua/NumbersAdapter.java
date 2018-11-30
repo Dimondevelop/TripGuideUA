@@ -19,7 +19,6 @@ import ua.tripguide.tripguideua.Models.ObjectList;
 
 public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberViewHolder> {
 
-    private int numberItems;
     private Context mContextObj;
     private List<ObjectList> mDataObjectList;
     private ArrayList<ObjectList> CheckedObjects = new ArrayList<>();
@@ -39,10 +38,9 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
         void onObjectClick(View view, int position);
     }
 
-    private static OnObjectClickListener mListener;
+    private OnObjectClickListener mListener;
 
-    NumbersAdapter(int numberItems, Context mContextObj, List<ObjectList> mDataObjectList) {
-        this.numberItems = numberItems;
+    NumbersAdapter(Context mContextObj, List<ObjectList> mDataObjectList) {
         this.mContextObj = mContextObj;
         this.mDataObjectList = mDataObjectList;
     }
@@ -61,12 +59,23 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
 
     @Override
     public void onBindViewHolder(@NonNull NumberViewHolder numberViewHolder, int position) {
-        numberViewHolder.bind(position);
+        tvNumberList.setText(mDataObjectList.get(position).getName_object());
+        tvTypeList.setText(String.format(" Тип: %s", mDataObjectList.get(position).getType_object()));
     }
 
     @Override
     public int getItemCount() {
-        return numberItems;
+        return mDataObjectList.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     // метод-сеттер для прив'язки колбека до отримувача подій
@@ -103,11 +112,6 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                 }
             });
             itemView.setOnClickListener(this);
-        }
-
-        void bind(int position) {
-            tvNumberList.setText(mDataObjectList.get(position).getName_object());
-            tvTypeList.setText(String.format(" Тип: %s", mDataObjectList.get(position).getType_object()));
         }
 
         CheckBox chb_create = itemView.findViewById(R.id.chb_create);

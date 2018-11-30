@@ -8,19 +8,14 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
@@ -39,7 +34,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.R;
@@ -61,8 +55,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     private String[] place_ids;
     private String[] working_hours;
 
-    private int height = 12;
-    private int width = 12;
+    private int height = 15;
+    private int width = 15;
 
     public GetDirectionsData(Context mContext, ArrayList<RouteObjectsInfo> lstRouteObjectsInfos) {
         this.mContext = mContext;
@@ -156,7 +150,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
             int countPoints;
             BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_small_white);
-            Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
+            Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, true);
 
             int i = 0;
 
@@ -206,19 +200,19 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                         }
 
                         BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_small_white);
-                        Bitmap waypointMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), 30, 30, false);
+                        Bitmap waypointMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), 30, 30, true);
 
-                        bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_middle_bagel);
-                        Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2, height * 2, false);
+                        bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.start_marker);
+                        Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 3, (int) Math.round((height / 0.67 * 1.13) * 3), true);
 
-                        bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_middle_black);
-                        Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 2 + 12, height * 2 + 12, false);
+                        bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.finish_marker);
+                        Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 3, (int) Math.round((height / 2.22 * 2.54) * 3), true);
                         for (int i = 0; i < lstSize; i++) {
                             mMap.addMarker(new MarkerOptions().position(myPlace[i].getLatLng()).snippet("Час роботи : \n" + working_hours[i])
                                     .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
                         }
-                        mMap.addMarker(new MarkerOptions().title(myPlace[0].getName().toString()).snippet("Приємної екскурсії").position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)).anchor(0.5f, 0.5f));
-                        mMap.addMarker(new MarkerOptions().title(myPlace[lstSize - 1].getName().toString()).position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)).anchor(0.5f, 0.5f));
+                        mMap.addMarker(new MarkerOptions().title(myPlace[0].getName().toString()).snippet("Приємної екскурсії").position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)));
+                        mMap.addMarker(new MarkerOptions().title(myPlace[lstSize - 1].getName().toString()).position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)));
                         assert places != null;
                         places.release();
                     } else {
@@ -226,7 +220,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     }
                 }
             });
-
 
         } catch (JSONException e) {
             e.printStackTrace();
