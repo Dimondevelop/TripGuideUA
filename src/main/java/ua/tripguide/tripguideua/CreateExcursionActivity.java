@@ -59,7 +59,6 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
                 coordinates_x = new float[countCheckedObjects];
                 coordinates_y = new float[countCheckedObjects];

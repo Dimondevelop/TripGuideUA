@@ -49,10 +49,9 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
     @NonNull
     @Override
     public NumberViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        Context context = parent.getContext();
         int layoutIdForListItem = R.layout.recyclerview_list_objects;
 
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(mContextObj);
         View view = inflater.inflate(layoutIdForListItem, parent, false);
 
         return new NumberViewHolder(view);
@@ -84,9 +83,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
         mListener = listener;
     }
 
-
     class NumberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         NumberViewHolder(@NonNull final View itemView) {
             super(itemView);
 
