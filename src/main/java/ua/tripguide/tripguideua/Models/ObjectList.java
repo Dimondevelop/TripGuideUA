@@ -11,11 +11,10 @@ public class ObjectList {
     private String object_description;
     private String type_object;
     private String working_hours;
-    private boolean visible;
 
 
     public ObjectList(int id_object, String name_object, String thumbnail_object, String place_id, float coordinate_x, float coordinate_y,
-                      int _id_city_object, String object_description, String type_object, String working_hours, boolean visible) {
+                      int _id_city_object, String object_description, String type_object, String working_hours) {
         this.id_object = id_object;
         this.name_object = name_object;
         this.thumbnail_object = thumbnail_object;
@@ -26,7 +25,6 @@ public class ObjectList {
         this.object_description = object_description;
         this.type_object = type_object;
         this.working_hours = working_hours;
-        this.visible = visible;
     }
 
     public int getId_object() {
@@ -107,13 +105,5 @@ public class ObjectList {
 
     public void setWorking_hours(String working_hours) {
         this.working_hours = working_hours;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
     }
 }

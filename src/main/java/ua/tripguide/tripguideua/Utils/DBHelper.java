@@ -138,7 +138,8 @@ public class DBHelper extends SQLiteOpenHelper {
         // відкриваємо підключення
         SQLiteDatabase db = open();
         //отримуємо дані з бд у вигляді курсора
-        Cursor userCursor = db.rawQuery("select * from " + TABLE_OBJECTS + " where " + COLUMN_CITY_ID_OBJECT + " = " + cityId + " order by " + COLUMN_OBJECT_NAME + " asc ", null);
+        Cursor userCursor = db.rawQuery("select * from " + TABLE_OBJECTS + " where " + COLUMN_CITY_ID_OBJECT + " = " + cityId +
+                " and " + COLUMN_OBJECT_VISIBLE + " = 1  order by " + COLUMN_OBJECT_NAME + " asc ", null);
 
         ArrayList<ObjectList> lstObjectList = new ArrayList<>();
 
@@ -153,7 +154,6 @@ public class DBHelper extends SQLiteOpenHelper {
             int descriptionObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_DESCRIPTION);
             int typeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_TYPE);
             int workTimeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_WORK_TIME);
-            int visibleObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_VISIBLE);
 
             do {
                 lstObjectList.add(new ObjectList(userCursor.getInt(idObjectIndex),
@@ -165,9 +165,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         userCursor.getInt(idCityObjectIndex),
                         userCursor.getString(descriptionObjectIndex),
                         userCursor.getString(typeObjectIndex),
-                        userCursor.getString(workTimeObjectIndex),
-                        userCursor.getInt(visibleObjectIndex)!=0
-                        ));
+                        userCursor.getString(workTimeObjectIndex)
+                ));
             } while (userCursor.moveToNext());
             // Закриваємо підключення і курсор
             close();
