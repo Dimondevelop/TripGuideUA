@@ -3,17 +3,22 @@ package ua.tripguide.tripguideua;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -22,9 +27,10 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import java.util.Locale;
 import java.util.Objects;
 
+import ua.tripguide.tripguideua.Utils.PopupAdapter;
 import ua.tripguide.tripguideua.Utils.UniversalImageLoader;
 
-public class MoreActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MoreActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private String objectName;
     private float coordinate_x;
@@ -35,7 +41,8 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
     String type_object;
     ImageLoader imageLoader = ImageLoader.getInstance();
 
-    private void initImageLoader(){
+
+    private void initImageLoader() {
         UniversalImageLoader universalImageLoader = new UniversalImageLoader(getBaseContext());
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
@@ -77,7 +84,7 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
         TextView tv_map_name = findViewById(R.id.tv_map_name);
 
 
-        imageLoader.displayImage(thumbnail_object, thumbnailObject, null, new  ImageLoadingListener () {
+        imageLoader.displayImage(thumbnail_object, thumbnailObject, null, new ImageLoadingListener() {
 
             @Override
             public void onLoadingStarted(String imageUri, View view) {
@@ -107,7 +114,7 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         justifiedParagraph.setText(object_description);
-        tvWorkingHours.setText(String.format("%s %s\n\n%s\n%s", getString(R.string.type_of), type_object,getString(R.string.working_hours), working_hours));
+        tvWorkingHours.setText(String.format("%s %s\n\n%s\n%s", getString(R.string.type_of), type_object, getString(R.string.working_hours), working_hours));
         tv_map_name.setText(String.format("%s %s", objectName, getString(R.string.on_map)));
 
 
@@ -134,11 +141,19 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnInfoWindowClickListener(this);
 
         // Add a marker in Sydney and move the camera
         LatLng latLng = new LatLng(coordinate_x, coordinate_y);
+
+        int height = 20;
+        int width = 20;
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.start_marker);
+        Bitmap middleMarkerStart = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 3, (int) Math.round((height / 0.67 * 1.13) * 3), true);
         mMap.addMarker(new MarkerOptions().position(latLng)
-                .title(objectName));
+                .title(objectName).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)));
+
+        mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16), 50, null);
     }
@@ -155,5 +170,10 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 }
