@@ -19,8 +19,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,9 +33,7 @@ import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -45,9 +41,7 @@ import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.Utils.GetDirectionsData;
 import ua.tripguide.tripguideua.Utils.PermissionUtils;
 import ua.tripguide.tripguideua.Utils.RequestBuilder;
-import ua.tripguide.tripguideua.Utils.PopupAdapter;
-
-import static android.support.constraint.Constraints.TAG;
+import ua.tripguide.tripguideua.Adapters.PopupAdapter;
 
 public class RoutesActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
@@ -76,7 +70,7 @@ public class RoutesActivity extends AppCompatActivity implements
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 17;
+    private static final int DEFAULT_ZOOM = 19;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -223,11 +217,15 @@ public class RoutesActivity extends AppCompatActivity implements
 
         Object[] dataTransfer = new Object[2];
 
-        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos);
+        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos,DEFAULT_ZOOM);
         dataTransfer[0] = mMap;
         dataTransfer[1] = url;
 
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(lstRouteObjectsInfos.get(0).getLatLng()));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lstRouteObjectsInfos.get(0).getLatLng(), DEFAULT_ZOOM), 50, null);
+
         getDirectionsData.execute(dataTransfer);
+
 
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DEBUG|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 //        mGeoDataClient.getPlaceById("EkJQbG9zaGNoYSBTb2Jvcm5hLCBDaGVybml2dHNpLCBDaGVybml2ZXRzJ2thIG9ibGFzdCwgVWtyYWluZSwgNTgwMDAiLiosChQKEgm_DRMdmAg0RxEfuEqlzepIkxIUChIJBc324n8INEcRem15WfaWs8U").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
@@ -251,8 +249,12 @@ public class RoutesActivity extends AppCompatActivity implements
 //|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
         mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(lstRouteObjectsInfos.get(0).getLatLng()));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lstRouteObjectsInfos.get(0).getLatLng(), DEFAULT_ZOOM), 50, null);
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                return marker.getSnippet().equals("distance($%code#1)");
+            }
+        });
     }
 
     /**
@@ -339,23 +341,27 @@ public class RoutesActivity extends AppCompatActivity implements
                             mLastKnownLocation = task.getResult();
                             assert mLastKnownLocation != null;
 
-                            lstRouteObjectsInfos.add(new RouteObjectsInfo("ChIJ7T8OhbOz0EARtk962u0zNPM", "Моє місцезнаходження", "",
+
+                            ArrayList<RouteObjectsInfo> lstRouteObjectsInfosWithLocation = new ArrayList<>(lstRouteObjectsInfos);
+
+                            lstRouteObjectsInfosWithLocation.add(new RouteObjectsInfo(null, "Моє місцезнаходження", "",
                                     new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
 
-                            int count = lstRouteObjectsInfos.size();
+                            int count = lstRouteObjectsInfosWithLocation.size();
 
-                            RouteObjectsInfo temp_after = new RouteObjectsInfo(lstRouteObjectsInfos.get(0).getPlace_id(), lstRouteObjectsInfos.get(0).getTitle(),
-                                    lstRouteObjectsInfos.get(0).getWorking_hour(), lstRouteObjectsInfos.get(0).getLatLng());
+                            RouteObjectsInfo temp_after = new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(0).getPlace_id(), lstRouteObjectsInfosWithLocation.get(0).getTitle(),
+                                    lstRouteObjectsInfosWithLocation.get(0).getWorking_hour(), lstRouteObjectsInfosWithLocation.get(0).getLatLng());
 
-                            lstRouteObjectsInfos.set(0, new RouteObjectsInfo(lstRouteObjectsInfos.get(count - 1).getPlace_id(), lstRouteObjectsInfos.get(count - 1).getTitle(),
-                                    lstRouteObjectsInfos.get(count - 1).getWorking_hour(), lstRouteObjectsInfos.get(count - 1).getLatLng()));
+                            lstRouteObjectsInfosWithLocation.set(0, new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(count - 1).getPlace_id(), lstRouteObjectsInfosWithLocation.get(count - 1).getTitle(),
+                                    lstRouteObjectsInfosWithLocation.get(count - 1).getWorking_hour(), lstRouteObjectsInfosWithLocation.get(count - 1).getLatLng()));
 
-                            lstRouteObjectsInfos.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getLatLng()));
+                            lstRouteObjectsInfosWithLocation.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getLatLng()));
+
 
                             mMap.clear();
-                            String urlNew = requestBuilder.buildUrl(sortLatLng(lstRouteObjectsInfos));
+                            String urlNew = requestBuilder.buildUrl(sortLatLng(lstRouteObjectsInfosWithLocation));
 
-                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos);
+                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfosWithLocation,DEFAULT_ZOOM);
 
                             Object[] dataTransfer = new Object[4];
 

@@ -27,7 +27,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import java.util.Locale;
 import java.util.Objects;
 
-import ua.tripguide.tripguideua.Utils.PopupAdapter;
+import ua.tripguide.tripguideua.Adapters.PopupAdapter;
 import ua.tripguide.tripguideua.Utils.UniversalImageLoader;
 
 public class MoreActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {

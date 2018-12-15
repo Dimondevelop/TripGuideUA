@@ -20,4 +20,16 @@
         <item name="android:backgroundDimEnabled">false</item> <!-- отключаем затемнение -->
     </style>
 
+    <style name="Text">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Text.Black">
+        <item name="android:textColor">@color/colorBlackLight</item>
+    </style>
+    <style name="Text.BlackBold">
+        <item name="android:textColor">@color/colorBlackLight</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

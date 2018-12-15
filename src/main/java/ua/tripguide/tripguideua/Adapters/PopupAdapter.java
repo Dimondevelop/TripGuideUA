@@ -1,4 +1,4 @@
-package ua.tripguide.tripguideua.Utils;
+package ua.tripguide.tripguideua.Adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
