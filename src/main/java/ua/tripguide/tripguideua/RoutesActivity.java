@@ -141,7 +141,7 @@ public class RoutesActivity extends AppCompatActivity implements
         int index = 1;
         double[] distances = new double[count - 1];
 
-//        AB = √(xb - xa)**2 + (yb - ya)**2 - формула дистанції
+//        AB = √(xb - xa)**2 + (yb - ya)**2 - формула відстані між точками
         for (int i = 0; i < count - 1; i++) {
             distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
                     + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));

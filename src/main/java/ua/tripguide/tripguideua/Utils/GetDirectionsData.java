@@ -39,6 +39,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.R;
@@ -61,6 +63,9 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     private ArrayList<String> place_ids = new ArrayList<>();
     private ArrayList<String> working_hours = new ArrayList<>();
 
+    private List<List<List<LatLng>>> lstLatLngsUpper = new ArrayList<>();
+    private List<List<LatLng>> lstLatLngsInner;
+
     private int height = 15;
     private int width = 15;
     private int DEFAULT_ZOOM;
@@ -70,7 +75,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         this.lstRouteObjectsInfos = lstRouteObjectsInfos;
         this.lstSize = lstRouteObjectsInfos.size();
         this.DEFAULT_ZOOM = DEFAULT_ZOOM;
-
 
 
         for (int i = 0; i < lstSize; i++) {
@@ -115,6 +119,21 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     @Override
     protected void onPostExecute(String s) {
 
+//        if (s.length() > 4000) {
+//            Log.v("SOFT ", "sb.length = " + s.length());
+//            int chunkCount = s.length() / 4000;     // integer division
+//            for (int i = 0; i <= chunkCount; i++) {
+//                int max = 4000 * (i + 1);
+//                if (max >= s.length()) {
+//                    Log.v("SOFT ", "chunk " + i + " of " + chunkCount + ":" + s.substring(4000 * i));
+//                } else {
+//                    Log.v("SOFT ", "chunk " + i + " of " + chunkCount + ":" + s.substring(4000 * i, max));
+//                }
+//            }
+//        } else {
+//            Log.v("SOFT ", s);
+//        }
+
         GeoDataClient mGeoDataClient = Places.getGeoDataClient(mContext);
 
         try {
@@ -126,7 +145,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 //            for (int i = 0; i < countWaypoints; i++) {
 //                placeIds[i] = jsonArrayGeocodedWaypoints.getJSONObject(i).getString("place_id");
 //            }
-
+            int pol = 0;
             JSONArray jsonArrayRoutes = jsonObjectResponse.getJSONArray("routes");
             JSONArray jsonArrayLegs = jsonArrayRoutes.getJSONObject(0).getJSONArray("legs");
             int countJsonArrayLegs = jsonArrayLegs.length();
@@ -153,27 +172,26 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     jsonObjectInSteps = jsonArraySteps[i].getJSONObject(j);
 
                     String polygone = jsonObjectInSteps.getJSONObject("polyline").getString("points");
+
+                    System.out.println("[" + (pol++) + "] " + polygone + " \n ");
+
                     String html_instructions = jsonObjectInSteps.getString("html_instructions");
 
                     arrayListSteps.add(new String[]{polygone, html_instructions});
                 }
-                arrayListLegsDistance.add(new Object[]{distanse, duration,latLngsWaypoints});
-                arrayListSteps = new ArrayList<>(arrayListSteps);
-                arrayListLegs.add(arrayListSteps);
-            }
+                arrayListLegsDistance.add(new Object[]{distanse, duration, latLngsWaypoints});
+                arrayListLegs.add(new ArrayList<>(arrayListSteps));
 
+                arrayListSteps = new ArrayList<>();
+            }
 
             int countPoints;
             BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.circle_small_white);
             Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, true);
 
 
-            final ArrayList<LatLng[]> lstLatLngsMiddle = new ArrayList<>();
-            LatLng[] latLngsMiddle;
-
-            int i = 0;
             for (ArrayList<String[]> arrayList : arrayListLegs) {
-
+                lstLatLngsInner = new ArrayList<>();
                 for (String[] poliline : arrayList) {
                     PolylineOptions options = new PolylineOptions();
                     options.color(Color.BLACK);
@@ -186,6 +204,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     countPoints = options.getPoints().size();
                     LatLng latLngStart = options.getPoints().get(0);
                     LatLng latLngFinish = options.getPoints().get(countPoints - 1);
+
+                    lstLatLngsInner.add(PolyUtil.decode(poliline[0]));
 
 //                    j = countPoints + j;
 //                    for (int p = 0; p < countPoints; p++) {
@@ -210,11 +230,32 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                     mMap.addPolyline(options);
 
                 }
-
+                lstLatLngsUpper.add(lstLatLngsInner);
 //                mMap.addMarker(new MarkerOptions().position(latLngs.get(i)));
-                i++;
             }
 
+
+//            for (int j = 0; j < arrayListLegs.size(); j++) {
+//                for (int t = 0; t < arrayListLegs.get(j).size(); t++) {
+//                    if (t == 0) {
+//                        System.out.println("[" + j + "]\n\t[" + t + "] " + arrayListLegs.get(j).get(t)[0]);
+//                    } else {
+//                        System.out.println("\t[" + t + "] " + arrayListLegs.get(j).get(t)[0]);
+//                    }
+//                }
+//            }
+
+//            for (int i = 0; i < lstLatLngsUpper.size(); i++) {
+//                for (int j = 0; j < lstLatLngsUpper.get(i).size(); j++) {
+//                    if (j == 0)
+//                        System.out.println("\ni[" + i + "] \n");
+//
+//                    System.out.println("\tj[" + j + "] \n");
+//                    for (int t = 0; t < lstLatLngsUpper.get(i).get(j).size(); t++){
+//                        System.out.println("\t\tt[" + t + "] {" + lstLatLngsUpper.get(i).get(j).get(t) + "}");
+//                    }
+//                }
+//            }
 
 
             mGeoDataClient.getPlaceById(place_ids.toArray(new String[0])).addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
@@ -245,24 +286,57 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                         }
 
                         IconGenerator iconFactory = new IconGenerator(mContext);
-                        iconFactory.setColor(Color.argb(142,3,169,245));
-                        iconFactory.setTextAppearance(mContext,R.style.Text_BlackBold);
+                        iconFactory.setColor(Color.argb(142, 3, 169, 245));
+                        iconFactory.setTextAppearance(mContext, R.style.Text_BlackBold);
+
+
+
+
+                        List<List<LatLng>> latLngsMiddle = new ArrayList<>();
+                        List<LatLng>  latLngsInner;
+                        for (int i = 0; i < lstLatLngsUpper.size(); i++) {
+                            latLngsInner = new ArrayList<>();
+                            for (int j = 0; j < lstLatLngsUpper.get(i).size(); j++) {
+                                latLngsInner.addAll(lstLatLngsUpper.get(i).get(j));
+                            }
+                            latLngsMiddle.add(latLngsInner);
+                        }
+
+//                        for (int i = 0; i < lstLatLngsUpper.size(); i++) {
+//                            for (int j = 0; j < lstLatLngsUpper.get(i).size(); j++) {
+//                                latLngsMiddle.addAll(lstLatLngsUpper.get(i).get(j));
+//                            }
+//                        }
 
 
                         MarkerOptions markerOptions;
                         for (int i = 1; i < arrayListLegsDistance.size(); i++) {
+
                             markerOptions = new MarkerOptions().snippet("distance($%code#1)")
-                                    .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("" + calculateDistance(Long.valueOf((String)arrayListLegsDistance.get(i)[0])) +
-                                            "\n" + calculateTime(Long.valueOf((String)arrayListLegsDistance.get(i)[1])))))
-                                    .position((LatLng)arrayListLegsDistance.get(i-1)[2])
+                                    .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Відстань: " + calculateDistance(Long.valueOf((String) arrayListLegsDistance.get(i)[0])) +
+                                            "\nЧас: " + calculateTime(Long.valueOf((String) arrayListLegsDistance.get(i)[1])))))
+                                    .position(findHalfRoute(latLngsMiddle.get(i),Long.valueOf((String) arrayListLegsDistance.get(i)[0])/2))
 //                                    .position(SphericalUtil.interpolate(myPlace[i - 1].getLatLng(), myPlace[i].getLatLng(), 0.5))
-                                    .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
-//                                    .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+                                    .anchor(iconFactory.getAnchorU()-0.1f, iconFactory.getAnchorV()-0.01f);
                             mMap.addMarker(markerOptions);
                         }
 
                         mMap.addMarker(new MarkerOptions().snippet("distance($%code#1)").position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)));
                         mMap.addMarker(new MarkerOptions().snippet("distance($%code#1)").position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)));
+
+//                        double fullDistance = 380;
+//
+//                        LatLng halfPoint = findHalfRoute(latLngsMiddle,fullDistance);
+//
+//                        markerOptions = new MarkerOptions().snippet("distance($%code#1)")
+//                                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("MiddlePoint")))
+//                                .position(halfPoint)
+////                                    .position(SphericalUtil.interpolate(myPlace[i - 1].getLatLng(), myPlace[i].getLatLng(), 0.5))
+//                                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+//                        mMap.addMarker(markerOptions);
+
+
+
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), DEFAULT_ZOOM), 50, null);
 
 
@@ -278,12 +352,45 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         }
         super.onPostExecute(s);
     }
+
+
+    private static LatLng findHalfRoute (List<LatLng> latLngsMiddle, double fullDistance){
+        double mDistance = 0;
+        LatLng halfPoint = latLngsMiddle.get(0);
+
+        for (int i = 1; i < latLngsMiddle.size();i++) {
+            if (mDistance < fullDistance) {
+                mDistance += SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i - 1),latLngsMiddle.get(i));
+            }
+            if (mDistance > fullDistance){
+                halfPoint = findMiddlePoint(latLngsMiddle.get(i - 1),latLngsMiddle.get(i),mDistance,fullDistance);
+//                mDistance -= SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i),halfPoint); //Дистанція до повертаємої точки
+                break;
+            }
+        }
+        return halfPoint;
+    }
+
+    private static LatLng findMiddlePoint (LatLng l1, LatLng l2, double distanceToL2, double fullDistance) {
+        double distanceBetween = SphericalUtil.computeDistanceBetween(l1,l2); //200
+        double distanceToL1 = distanceToL2 - distanceBetween;
+        double dist = distanceToL1+distanceBetween/2;
+
+        LatLng half = SphericalUtil.interpolate(l1, l2, 0.1);
+        if (fullDistance > dist){
+            return half;
+        } else {
+            l2 = half;
+           return findMiddlePoint(l1,l2,distanceToL1,fullDistance);
+        }
+    }
+
     private static String calculateDistance(long metres) {
         long m = metres % 1000;
         long km = metres % 10000 / 1000;
 
         if (km == 0)
-            return m+" м.";
+            return m + " м.";
         else if (km > 0 && m > 0)
             return km + " км. " + m + " м.";
         else return km + " км.";
@@ -293,11 +400,13 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         long minutes = seconds % 3600 / 60;
         long hours = seconds % 86400 / 3600;
 
-        if (hours == 0)
-            return minutes+" хв.";
-       else if (hours > 0 && minutes > 0)
-           return hours + " год. " + minutes + " хв.";
-       else return hours + " год.";
+        if (hours == 0 && minutes == 0 )
+            return 1 + " хв.";
+        else if (hours == 0)
+            return minutes + " хв.";
+        else if (hours > 0 && minutes > 0)
+            return hours + " год. " + minutes + " хв.";
+        else return hours + " год.";
     }
 
 
