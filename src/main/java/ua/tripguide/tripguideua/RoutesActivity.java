@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -143,8 +144,9 @@ public class RoutesActivity extends AppCompatActivity implements
 
 //        AB = √(xb - xa)**2 + (yb - ya)**2 - формула відстані між точками
         for (int i = 0; i < count - 1; i++) {
-            distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
-                    + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));
+//            distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
+//                    + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));
+            distances[i] = SphericalUtil.computeDistanceBetween(routeObjectsInfoList.get(0).getLatLng(),routeObjectsInfoList.get(i + 1).getLatLng());
         }
 
         double temp = distances[0];
@@ -281,17 +283,17 @@ public class RoutesActivity extends AppCompatActivity implements
     }
 
     private boolean buildAlertMessageNoLocationService(boolean network_enabled) {
-        String msg = !network_enabled ? ("Для визначення місцезнаходження потрібно увімкнути місцезнаходження") : null;
+        String msg = !network_enabled ? ("Для визначення поточного місцезнаходження потрібно увімкнути геолокацію") : null;
 
         if (msg != null) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setCancelable(true)
-                    .setMessage(msg).setNegativeButton("скасувати", new DialogInterface.OnClickListener() {
+                    .setMessage(msg).setNegativeButton(" скасувати ", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                 }
             })
-                    .setPositiveButton("увімкнути", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(" увімкнути ", new DialogInterface.OnClickListener() {
                         public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         }

@@ -25,7 +25,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
-import com.google.maps.android.ui.BubbleIconFactory;
 import com.google.maps.android.ui.IconGenerator;
 
 import org.json.JSONArray;
@@ -39,7 +38,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
@@ -145,7 +143,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 //            for (int i = 0; i < countWaypoints; i++) {
 //                placeIds[i] = jsonArrayGeocodedWaypoints.getJSONObject(i).getString("place_id");
 //            }
-            int pol = 0;
+
             JSONArray jsonArrayRoutes = jsonObjectResponse.getJSONArray("routes");
             JSONArray jsonArrayLegs = jsonArrayRoutes.getJSONObject(0).getJSONArray("legs");
             int countJsonArrayLegs = jsonArrayLegs.length();
@@ -173,15 +171,12 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
                     String polygone = jsonObjectInSteps.getJSONObject("polyline").getString("points");
 
-                    System.out.println("[" + (pol++) + "] " + polygone + " \n ");
-
                     String html_instructions = jsonObjectInSteps.getString("html_instructions");
 
                     arrayListSteps.add(new String[]{polygone, html_instructions});
                 }
                 arrayListLegsDistance.add(new Object[]{distanse, duration, latLngsWaypoints});
                 arrayListLegs.add(new ArrayList<>(arrayListSteps));
-
                 arrayListSteps = new ArrayList<>();
             }
 
@@ -315,9 +310,9 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                             markerOptions = new MarkerOptions().snippet("distance($%code#1)")
                                     .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Відстань: " + calculateDistance(Long.valueOf((String) arrayListLegsDistance.get(i)[0])) +
                                             "\nЧас: " + calculateTime(Long.valueOf((String) arrayListLegsDistance.get(i)[1])))))
-                                    .position(findHalfRoute(latLngsMiddle.get(i),Long.valueOf((String) arrayListLegsDistance.get(i)[0])/2))
-//                                    .position(SphericalUtil.interpolate(myPlace[i - 1].getLatLng(), myPlace[i].getLatLng(), 0.5))
-                                    .anchor(iconFactory.getAnchorU()-0.1f, iconFactory.getAnchorV()-0.01f);
+                                    .position(findHalfRoute(latLngsMiddle.get(i),Double.valueOf((String) arrayListLegsDistance.get(i)[0])/2))
+                                    .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+//                                    .anchor(iconFactory.getAnchorU()-0.1f, iconFactory.getAnchorV()-0.01f);
                             mMap.addMarker(markerOptions);
                         }
 
@@ -354,36 +349,41 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     }
 
 
-    private static LatLng findHalfRoute (List<LatLng> latLngsMiddle, double fullDistance){
+    private static LatLng findHalfRoute (List<LatLng> latLngsMiddle, double halfDistance){
         double mDistance = 0;
         LatLng halfPoint = latLngsMiddle.get(0);
 
         for (int i = 1; i < latLngsMiddle.size();i++) {
-            if (mDistance < fullDistance) {
+            if (mDistance < halfDistance) {
                 mDistance += SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i - 1),latLngsMiddle.get(i));
             }
-            if (mDistance > fullDistance){
-                halfPoint = findMiddlePoint(latLngsMiddle.get(i - 1),latLngsMiddle.get(i),mDistance,fullDistance);
+            if (mDistance > halfDistance){
+                double distanceBetween = SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i - 1),latLngsMiddle.get(i));
+                double dif = distanceBetween-(mDistance - halfDistance);
+                double fraction = 100/mDistance*dif/100;
+                halfPoint = SphericalUtil.interpolate(latLngsMiddle.get(i - 1),latLngsMiddle.get(i), fraction);
+//                halfPoint = findMiddlePoint(latLngsMiddle.get(i - 1),latLngsMiddle.get(i),mDistance,halfDistance);
+                //DEBUG
 //                mDistance -= SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i),halfPoint); //Дистанція до повертаємої точки
+//                System.out.println("mDistance " + mDistance + "\nhalfDistance " + halfDistance + "\ndistanceBetween " + distanceBetween+"\ndif "+ dif+"\nfraction " + fraction);
                 break;
             }
         }
         return halfPoint;
     }
 
-    private static LatLng findMiddlePoint (LatLng l1, LatLng l2, double distanceToL2, double fullDistance) {
-        double distanceBetween = SphericalUtil.computeDistanceBetween(l1,l2); //200
-        double distanceToL1 = distanceToL2 - distanceBetween;
-        double dist = distanceToL1+distanceBetween/2;
-
-        LatLng half = SphericalUtil.interpolate(l1, l2, 0.1);
-        if (fullDistance > dist){
-            return half;
-        } else {
-            l2 = half;
-           return findMiddlePoint(l1,l2,distanceToL1,fullDistance);
-        }
-    }
+//    private static LatLng findMiddlePoint (LatLng l1, LatLng l2, double distanceToL2, double fullDistance) {
+//        double distanceBetween = SphericalUtil.computeDistanceBetween(l1,l2); //200
+//        double distanceToL1 = distanceToL2 - distanceBetween;
+//        double dist = distanceToL1+distanceBetween/2;
+//        LatLng half = SphericalUtil.interpolate(l1, l2, 0.1);
+//        if (fullDistance > dist){
+//            return half;
+//        } else {
+//            l2 = half;
+//           return findMiddlePoint(l1,l2,distanceToL1,fullDistance);
+//        }
+//    }
 
     private static String calculateDistance(long metres) {
         long m = metres % 1000;
