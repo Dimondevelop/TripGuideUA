@@ -104,6 +104,7 @@ public class NumbersAdapter extends RecyclerView.Adapter<NumbersAdapter.NumberVi
                     intent.putExtra("object_description", mDataObjectList.get(positionIndex).getObject_description());
                     intent.putExtra("working_hours", mDataObjectList.get(positionIndex).getWorking_hours());
                     intent.putExtra("type_object", mDataObjectList.get(positionIndex).getType_object());
+                    intent.putExtra("average_duration", mDataObjectList.get(positionIndex).getAverage_duration());
 
                     //start the activity
                     mContextObj.startActivity(intent);

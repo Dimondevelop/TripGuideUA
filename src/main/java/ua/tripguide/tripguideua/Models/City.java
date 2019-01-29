@@ -27,7 +27,6 @@ public class City {
         return Thumbnail;
     }
 
-
     public void setName(String name) {
         this.name = name;
     }

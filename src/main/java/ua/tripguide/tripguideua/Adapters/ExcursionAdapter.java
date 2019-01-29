@@ -25,6 +25,7 @@ public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.Excu
     private float[] coordinates_y;
     private String[] titles;
     private String[] working_hours;
+    private int[] average_duration;
     private String[] place_ids;
 
 
@@ -89,6 +90,7 @@ public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.Excu
                     coordinates_y = new float[countlstExcursions];
                     titles = new String[countlstExcursions];
                     working_hours = new String[countlstExcursions];
+                    average_duration = new int[countlstExcursions];
                     place_ids = new String[countlstExcursions];
 
                     for (int i = 0; i < countlstExcursions; i++) {
@@ -96,6 +98,7 @@ public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.Excu
                         coordinates_y[i] = (float)lstExcursions.get(position).getRouteObjectsInfos().get(i).getLatLng().longitude;
                         titles[i] =lstExcursions.get(position).getRouteObjectsInfos().get(i).getTitle();
                         working_hours[i] = lstExcursions.get(position).getRouteObjectsInfos().get(i).getWorking_hour();
+                        average_duration[i] = lstExcursions.get(position).getRouteObjectsInfos().get(i).getAverage_duration();
                         place_ids[i] = lstExcursions.get(position).getRouteObjectsInfos().get(i).getPlace_id();
                     }
                               //DEBUG
@@ -109,6 +112,7 @@ public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.Excu
                     intent.putExtra("coordinates_y", coordinates_y);
                     intent.putExtra("titles", titles);
                     intent.putExtra("working_hours", working_hours);
+                    intent.putExtra("average_duration", average_duration);
                     intent.putExtra("place_ids", place_ids);
                     mContextEx.startActivity(intent);
 

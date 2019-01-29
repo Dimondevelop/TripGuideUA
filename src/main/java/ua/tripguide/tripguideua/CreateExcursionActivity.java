@@ -29,6 +29,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
     String[] titles;
     String[] working_hours;
     String[] place_ids;
+    int[] average_duration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                 titles = new String[countCheckedObjects];
                 working_hours = new String[countCheckedObjects];
                 place_ids = new String[countCheckedObjects];
+                average_duration = new int[countCheckedObjects];
 
                 for (int i = 0; i < countCheckedObjects; i++) {
                     coordinates_x[i] = numbersAdapter.getCheckedObjects().get(i).getCoordinate_x();
@@ -72,6 +74,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                     titles[i] = numbersAdapter.getCheckedObjects().get(i).getName_object();
                     working_hours[i] = numbersAdapter.getCheckedObjects().get(i).getWorking_hours();
                     place_ids[i] = numbersAdapter.getCheckedObjects().get(i).getPlace_id();
+                    average_duration[i] = numbersAdapter.getCheckedObjects().get(i).getAverage_duration();
                 }
 
                 Context vContext = v.getContext();
@@ -81,6 +84,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
                 intent.putExtra("titles", titles);
                 intent.putExtra("working_hours", working_hours);
                 intent.putExtra("place_ids", place_ids);
+                intent.putExtra("average_duration", average_duration);
                 vContext.startActivity(intent);
             }
         });

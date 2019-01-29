@@ -7,7 +7,6 @@
     android:paddingBottom="2dp"
     android:paddingTop="2dp">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
@@ -47,7 +46,8 @@
             android:layout_weight="20"
             android:layout_marginTop="2dp"
             android:clickable="false"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="100">
 
             <LinearLayout
                 android:id="@+id/ll_more"
@@ -64,7 +64,8 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/more" />
+                    android:src="@drawable/more"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -76,14 +77,12 @@
 
             </LinearLayout>
 
-
-
             <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/chb_create"
                 android:layout_marginTop="15dp"
-                android:layout_marginStart="8dp"
-                android:scaleX="2.3"
-                android:scaleY="2.3"
+                android:layout_marginStart="13dp"
+                android:scaleX="2.4"
+                android:scaleY="2.4"
                 android:clickable="false"
                 android:textColor="#000"
                 android:layout_width="wrap_content"
@@ -92,7 +91,6 @@
                 android:layout_gravity="center"
                 />
         </LinearLayout>
-
 
     </LinearLayout>
 </FrameLayout>

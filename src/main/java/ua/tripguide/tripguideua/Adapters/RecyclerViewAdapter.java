@@ -32,6 +32,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
         this.mContext = mContext;
         this.mData = mData;
         this.itemCount = itemCount;
+        initImageLoader();
     }
 
     private void initImageLoader(){
@@ -42,7 +43,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        initImageLoader();
 
         View view;
         LayoutInflater mInflater = LayoutInflater.from(mContext);

@@ -29,7 +29,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String TABLE_CITIES = "cities"; // назва таблиці з містами в бд
     private static final String TABLE_OBJECTS = "objects"; // назва таблиці з об'єктами в бд
     private static final String TABLE_EXCURSION = "excursions"; // назва таблиці з екскурсіями в бд
-
     // назви стовбців таблиці з містами
     private static final String COLUMN_CITY_ID = "_id";
     private static final String COLUMN_CITY_NAME = "name";
@@ -47,6 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_OBJECT_DESCRIPTION = "description_object";
     private static final String COLUMN_OBJECT_TYPE = "type_object";
     private static final String COLUMN_OBJECT_WORK_TIME = "working_hours";
+    private static final String COLUMN_OBJECT_AVERAGE_DURATION = "average_duration";
     private static final String COLUMN_OBJECT_VISIBLE = "visible";
     // назви стовбців таблиці з екскурсіями
     private static final String COLUMN_EXCURSION_ID = "_id_excursion";
@@ -154,6 +154,7 @@ public class DBHelper extends SQLiteOpenHelper {
             int descriptionObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_DESCRIPTION);
             int typeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_TYPE);
             int workTimeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_WORK_TIME);
+            int averageDurationObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_AVERAGE_DURATION);
 
             do {
                 lstObjectList.add(new ObjectList(userCursor.getInt(idObjectIndex),
@@ -165,7 +166,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         userCursor.getInt(idCityObjectIndex),
                         userCursor.getString(descriptionObjectIndex),
                         userCursor.getString(typeObjectIndex),
-                        userCursor.getString(workTimeObjectIndex)
+                        userCursor.getString(workTimeObjectIndex),
+                        userCursor.getInt(averageDurationObjectIndex)
                 ));
             } while (userCursor.moveToNext());
             // Закриваємо підключення і курсор
@@ -195,7 +197,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             do {
                 Cursor userCursorObj = db.rawQuery("select " + COLUMN_OBJECT_NAME + "," + COLUMN_OBJECT_PLACE_ID + "," + COLUMN_OBJECT_WORK_TIME + "," +
-                        COLUMN_OBJECT_COORDINATE_X + "," + COLUMN_OBJECT_COORDINATE_Y +
+                        COLUMN_OBJECT_AVERAGE_DURATION + "," + COLUMN_OBJECT_COORDINATE_X + "," + COLUMN_OBJECT_COORDINATE_Y +
                         " from " + TABLE_OBJECTS + " where " + COLUMN_OBJECT_ID + " IN (" + userCursor.getString(typeExcutsionIndex) + ") and " + COLUMN_CITY_ID_OBJECT + " = " + cityId, null);
                 if (userCursorObj.moveToFirst()) {
                     lstExcursion.add(new Excursion(
@@ -228,13 +230,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return objectsIds;
     }
 
-
+                //ROI (RouteObjectsInfo) - загальна модель екскурсійного об'єкту з обмеженим набором
+                // атрибутів, потрібних для прокладання маршруту
     private ArrayList<RouteObjectsInfo> getROIFromCursor(Cursor userCursorObj) {
         ArrayList<RouteObjectsInfo> lstRouteObjectsInfos = new ArrayList<>();
 
         int placeIdIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_PLACE_ID);
         int nameObjectIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_NAME);
         int workTimeObjectIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_WORK_TIME);
+        int averageDurationObjectIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_AVERAGE_DURATION);
         int coordinateXIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_COORDINATE_X);
         int coordinateYIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_COORDINATE_Y);
         do {
@@ -242,6 +246,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     userCursorObj.getString(placeIdIndex),
                     userCursorObj.getString(nameObjectIndex),
                     userCursorObj.getString(workTimeObjectIndex),
+                    userCursorObj.getInt(averageDurationObjectIndex),
                     new LatLng(userCursorObj.getFloat(coordinateXIndex),
                             userCursorObj.getFloat(coordinateYIndex))));
 
