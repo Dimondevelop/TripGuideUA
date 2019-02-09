@@ -60,6 +60,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
     private ArrayList<String> place_ids = new ArrayList<>();
     private ArrayList<String> working_hours = new ArrayList<>();
+    private ArrayList<Integer> average_duration = new ArrayList<>();
 
     private List<List<List<LatLng>>> lstLatLngsUpper = new ArrayList<>();
     private List<List<LatLng>> lstLatLngsInner;
@@ -79,6 +80,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
             if (lstRouteObjectsInfos.get(i).getPlace_id() != null) {
                 place_ids.add(lstRouteObjectsInfos.get(i).getPlace_id());
                 working_hours.add(lstRouteObjectsInfos.get(i).getWorking_hour());
+                average_duration.add(lstRouteObjectsInfos.get(i).getAverage_duration());
             }
         }
         countPlaceIds = place_ids.size();
@@ -275,16 +277,18 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                         bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.finish_marker);
                         Bitmap middleMarkerFinish = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width * 3, (int) Math.round((height / 2.22 * 2.54) * 3), true);
 
+                        int avg_count = 0;
+
                         for (int i = 0; i < countPlaceIds; i++) {
-                            mMap.addMarker(new MarkerOptions().zIndex(5).position(myPlace[i].getLatLng()).snippet("Час роботи : " + working_hours.get(i))
+                            avg_count += average_duration.get(i);
+                            mMap.addMarker(new MarkerOptions().zIndex(5).position(myPlace[i].getLatLng()).snippet("Графік роботи : " + working_hours.get(i) +
+                                    "\nТривалість екскурсії: ≈ " + calculateTime(average_duration.get(i)*60)) //значення average_duration повертається в хв, а функція приймає значення секкунд, тому множимо на 60
                                     .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
                         }
 
                         IconGenerator iconFactory = new IconGenerator(mContext);
                         iconFactory.setColor(Color.argb(142, 3, 169, 245));
                         iconFactory.setTextAppearance(mContext, R.style.Text_BlackBold);
-
-
 
 
                         List<List<LatLng>> latLngsMiddle = new ArrayList<>();

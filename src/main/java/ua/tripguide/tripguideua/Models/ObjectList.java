@@ -12,10 +12,11 @@ public class ObjectList {
     private String type_object;
     private String working_hours;
     private int average_duration;
+    private int price;
 
 
     public ObjectList(int id_object, String name_object, String thumbnail_object, String place_id, float coordinate_x, float coordinate_y,
-                      int _id_city_object, String object_description, String type_object, String working_hours, int average_duration) {
+                      int _id_city_object, String object_description, String type_object, String working_hours, int average_duration, int price) {
         this.id_object = id_object;
         this.name_object = name_object;
         this.thumbnail_object = thumbnail_object;
@@ -27,6 +28,7 @@ public class ObjectList {
         this.type_object = type_object;
         this.working_hours = working_hours;
         this.average_duration = average_duration;
+        this.price = price;
     }
 
     public int getId_object() {
@@ -115,5 +117,13 @@ public class ObjectList {
 
     public void setAverage_duration(int average_duration) {
         this.average_duration = average_duration;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -139,8 +141,8 @@ public class RoutesActivity extends AppCompatActivity implements
         }
     }
 
-    private ArrayList<RouteObjectsInfo> sortLatLng(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
-        int count = latLngs.length;
+    public static ArrayList<RouteObjectsInfo> sortLatLng(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
+        int count = routeObjectsInfoList.size();
         int index = 1;
         double[] distances = new double[count - 1];
 
@@ -148,7 +150,7 @@ public class RoutesActivity extends AppCompatActivity implements
         for (int i = 0; i < count - 1; i++) {
 //            distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
 //                    + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));
-            distances[i] = SphericalUtil.computeDistanceBetween(routeObjectsInfoList.get(0).getLatLng(),routeObjectsInfoList.get(i + 1).getLatLng());
+            distances[i] = SphericalUtil.computeDistanceBetween(routeObjectsInfoList.get(0).getLatLng(), routeObjectsInfoList.get(i + 1).getLatLng());
         }
 
         double temp = distances[0];
@@ -174,7 +176,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
         int count = routeObjectsInfoList.size();
 
-        routeObjectsInfoList = new ArrayList<>(sortLatLng(routeObjectsInfoList));
+        routeObjectsInfoList = new ArrayList<>(RoutesActivity.sortLatLng(routeObjectsInfoList));
 
         RouteObjectsInfo temp_before = new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
                 routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getAverage_duration(), routeObjectsInfoList.get(0).getLatLng());
@@ -222,7 +224,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
         Object[] dataTransfer = new Object[2];
 
-        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos,DEFAULT_ZOOM);
+        GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfos, DEFAULT_ZOOM);
         dataTransfer[0] = mMap;
         dataTransfer[1] = url;
 
@@ -233,7 +235,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
 
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DEBUG|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-//        mGeoDataClient.getPlaceById("EkJQbG9zaGNoYSBTb2Jvcm5hLCBDaGVybml2dHNpLCBDaGVybml2ZXRzJ2thIG9ibGFzdCwgVWtyYWluZSwgNTgwMDAiLiosChQKEgm_DRMdmAg0RxEfuEqlzepIkxIUChIJBc324n8INEcRem15WfaWs8U").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+//        mGeoDataClient.getPlaceById("ChIJXXgL7TEPNEcRtq9SOd4O0Zc").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
 //            @Override
 //            public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
 //                if (task.isSuccessful()) {
@@ -295,12 +297,11 @@ public class RoutesActivity extends AppCompatActivity implements
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                 }
-            })
-                    .setPositiveButton(" увімкнути ", new DialogInterface.OnClickListener() {
-                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        }
-                    });
+            }).setPositiveButton(" увімкнути ", new DialogInterface.OnClickListener() {
+                public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+            });
             final AlertDialog alert = builder.create();
             alert.show();
             return true;
@@ -349,7 +350,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
                             ArrayList<RouteObjectsInfo> lstRouteObjectsInfosWithLocation = new ArrayList<>(lstRouteObjectsInfos);
 
-                            lstRouteObjectsInfosWithLocation.add(new RouteObjectsInfo(null, "Моє місцезнаходження", "",0,
+                            lstRouteObjectsInfosWithLocation.add(new RouteObjectsInfo(null, "Моє місцезнаходження", "", 0,
                                     new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
 
                             int count = lstRouteObjectsInfosWithLocation.size();
@@ -366,7 +367,7 @@ public class RoutesActivity extends AppCompatActivity implements
                             mMap.clear();
                             String urlNew = requestBuilder.buildUrl(sortLatLng(lstRouteObjectsInfosWithLocation));
 
-                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfosWithLocation,DEFAULT_ZOOM);
+                            GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfosWithLocation, DEFAULT_ZOOM);
 
                             Object[] dataTransfer = new Object[4];
 

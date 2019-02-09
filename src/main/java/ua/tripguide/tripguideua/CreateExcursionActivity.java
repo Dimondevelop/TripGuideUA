@@ -20,7 +20,7 @@ import ua.tripguide.tripguideua.Utils.DBHelper;
 public class CreateExcursionActivity extends AppCompatActivity implements NumbersAdapter.OnObjectClickListener {
 
 
-    LinearLayout linearLayout;
+    LinearLayout llCreateExcurion;
     NumbersAdapter numbersAdapter;
     RecyclerView rv_numbers;
 
@@ -47,7 +47,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         ArrayList<ObjectList> lstObjectList = dbHelper.getObjectsFromDB(cityId);
 
-        linearLayout = findViewById(R.id.ll_create_excursion_with_objects);
+        llCreateExcurion = findViewById(R.id.ll_create_excursion_with_objects);
 
         rv_numbers = findViewById(R.id.rv_numbers);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -57,7 +57,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
         numbersAdapter.setOnObjectClickListener(this);
         rv_numbers.setAdapter(numbersAdapter);
 
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        llCreateExcurion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int countCheckedObjects = numbersAdapter.getCheckedObjects().size();
@@ -111,10 +111,10 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
 
         if (numbersAdapter.isFlag()) {
             rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 92.0f));
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
+            llCreateExcurion.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 8.0f));
         } else {
             rv_numbers.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 100.0f));
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
+            llCreateExcurion.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
         }
     }
 

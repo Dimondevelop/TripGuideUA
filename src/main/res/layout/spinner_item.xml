@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <ImageView
+            android:id="@+id/iv_spinner_logo"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="20"
+            android:layout_gravity="center"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="10dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="66"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_spinner_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:textSize="17sp"
+                android:textColor="#f2f2f2"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_spinner_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:textSize="15sp"
+                android:textColor="#cbcbcb"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_icon_spinner"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight="15"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/icon_spinner"/>
+
+    </LinearLayout>
+
+</LinearLayout>

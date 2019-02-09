@@ -94,7 +94,7 @@ public class MoreActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                 if (failReason.getType() == FailReason.FailType.IO_ERROR) {
-                    tvErrorImage.setText("Відсутнє інтернет з'єднання.");
+                    tvErrorImage.setText("Не вдалося завантажити зображення.");
                     tvErrorImage.setVisibility(View.VISIBLE);
                 } else {
                     tvErrorImage.setText("Сталася помилка.");

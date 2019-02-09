@@ -47,6 +47,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_OBJECT_TYPE = "type_object";
     private static final String COLUMN_OBJECT_WORK_TIME = "working_hours";
     private static final String COLUMN_OBJECT_AVERAGE_DURATION = "average_duration";
+    private static final String COLUMN_OBJECT_PRICE = "price";
     private static final String COLUMN_OBJECT_VISIBLE = "visible";
     // назви стовбців таблиці з екскурсіями
     private static final String COLUMN_EXCURSION_ID = "_id_excursion";
@@ -155,6 +156,7 @@ public class DBHelper extends SQLiteOpenHelper {
             int typeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_TYPE);
             int workTimeObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_WORK_TIME);
             int averageDurationObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_AVERAGE_DURATION);
+            int priceObjectIndex = userCursor.getColumnIndex(COLUMN_OBJECT_PRICE);
 
             do {
                 lstObjectList.add(new ObjectList(userCursor.getInt(idObjectIndex),
@@ -167,7 +169,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         userCursor.getString(descriptionObjectIndex),
                         userCursor.getString(typeObjectIndex),
                         userCursor.getString(workTimeObjectIndex),
-                        userCursor.getInt(averageDurationObjectIndex)
+                        userCursor.getInt(averageDurationObjectIndex),
+                        userCursor.getInt(priceObjectIndex)
                 ));
             } while (userCursor.moveToNext());
             // Закриваємо підключення і курсор
@@ -220,15 +223,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return lstExcursion;
     }
 
-    private Integer[] getExcursionsObjectsIds(String s) {
-        String[] subStr = s.split(",");
-        int count = subStr.length;
-        Integer[] objectsIds = new Integer[count];
-        for (int j = 0; j < count; j++) {
-            objectsIds[j] = Integer.valueOf(subStr[j]);
-        }
-        return objectsIds;
-    }
+//    private Integer[] getExcursionsObjectsIds(String s) {
+//        String[] subStr = s.split(",");
+//        int count = subStr.length;
+//        Integer[] objectsIds = new Integer[count];
+//        for (int j = 0; j < count; j++) {
+//            objectsIds[j] = Integer.valueOf(subStr[j]);
+//        }
+//        return objectsIds;
+//    }
 
                 //ROI (RouteObjectsInfo) - загальна модель екскурсійного об'єкту з обмеженим набором
                 // атрибутів, потрібних для прокладання маршруту
