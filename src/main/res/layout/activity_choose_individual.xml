@@ -118,7 +118,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Перерив після 2-х годин екскурсії"
+                    android:text="@string/brake_title"
                     android:textAlignment="center"
                     android:textColor="#f2f2f2"
                     android:textSize="18sp" />
@@ -168,7 +168,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:text="В довготривалій екскурсії, внести до маршруту заклади, де можна поїсти та сходити в туалет"
+                                android:text="@string/brake_description"
                                 android:textColor="#cbcbcb"
                                 android:textSize="15sp"
                                 android:textStyle="italic" />

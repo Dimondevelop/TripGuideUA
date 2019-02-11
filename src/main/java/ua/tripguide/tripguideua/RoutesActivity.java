@@ -40,11 +40,14 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
+import ua.tripguide.tripguideua.Models.ObjectList;
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
+import ua.tripguide.tripguideua.Utils.DBHelper;
 import ua.tripguide.tripguideua.Utils.GetDirectionsData;
 import ua.tripguide.tripguideua.Utils.PermissionUtils;
 import ua.tripguide.tripguideua.Utils.RequestBuilder;
 import ua.tripguide.tripguideua.Adapters.PopupAdapter;
+import ua.tripguide.tripguideua.Utils.UtilMethods;
 
 public class RoutesActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
@@ -61,6 +64,9 @@ public class RoutesActivity extends AppCompatActivity implements
     RequestBuilder requestBuilder;
 
     Context mContext = this;
+
+    private DBHelper dbHelper;
+    private ArrayList<ObjectList> lstObjectBreakList;
 
     private Location mLastKnownLocation;
 
@@ -82,7 +88,8 @@ public class RoutesActivity extends AppCompatActivity implements
     private boolean mPermissionDenied = false;
 
     private LatLng[] latLngs;
-    int countLatLngs;
+    int countLatLngs, cityId;
+    boolean breakTime;
     String[] place_ids;
     String[] titles;
     String[] working_hours;
@@ -111,6 +118,8 @@ public class RoutesActivity extends AppCompatActivity implements
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext);
 
         Intent intent = getIntent();
+        breakTime = Objects.requireNonNull(intent.getExtras()).getBoolean("breakTime");
+        cityId = Objects.requireNonNull(intent.getExtras()).getInt("cityId");
         float[] coordinates_y = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_y");
         float[] coordinates_x = Objects.requireNonNull(intent.getExtras()).getFloatArray("coordinates_x");
         place_ids = Objects.requireNonNull(intent.getExtras()).getStringArray("place_ids");
@@ -220,8 +229,29 @@ public class RoutesActivity extends AppCompatActivity implements
         mMap.setOnInfoWindowClickListener(this);
         enableMyLocation();
 
+        if (breakTime){
+            dbHelper = new DBHelper(mContext);
+            lstObjectBreakList = dbHelper.getObjectsFromDB(cityId, true);
+
+            lstRouteObjectsInfos = doubleSort(lstRouteObjectsInfos);
+            int countAvg = 0;
+
+            for (int i = 0; i < lstRouteObjectsInfos.size(); i++) {
+                countAvg += lstRouteObjectsInfos.get(i).getAverage_duration();
+                if (countAvg >= 60 * 2) {
+                    lstRouteObjectsInfos.add(i, UtilMethods.nearestObject(lstRouteObjectsInfos.get(i), lstObjectBreakList));
+                    break;
+                }
+            }
+        } else {
+            lstRouteObjectsInfos = doubleSort(lstRouteObjectsInfos);
+        }
+
+
+
+
         requestBuilder = new RequestBuilder();
-        String url = requestBuilder.buildUrl(doubleSort(lstRouteObjectsInfos));
+        String url = requestBuilder.buildUrl(lstRouteObjectsInfos);
 
         Object[] dataTransfer = new Object[2];
 
@@ -236,7 +266,7 @@ public class RoutesActivity extends AppCompatActivity implements
 
 
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DEBUG|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-//        mGeoDataClient.getPlaceById("ChIJXXgL7TEPNEcRtq9SOd4O0Zc").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+//        mGeoDataClient.getPlaceById("ChIJi29iwrgINEcRWJ6tTNQGrWI").addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
 //            @Override
 //            public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
 //                if (task.isSuccessful()) {

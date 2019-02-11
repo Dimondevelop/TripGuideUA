@@ -133,14 +133,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return lstCity;
     }
 
-    public ArrayList<ObjectList> getObjectsFromDB(int cityId) {
+    public ArrayList<ObjectList> getObjectsFromDB(int cityId, boolean breakObject) {
+        int visible = (breakObject) ? 0 : 1;
         // створюємо екземпляр бази данних
         create_db();
         // відкриваємо підключення
         SQLiteDatabase db = open();
         //отримуємо дані з бд у вигляді курсора
         Cursor userCursor = db.rawQuery("select * from " + TABLE_OBJECTS + " where " + COLUMN_CITY_ID_OBJECT + " = " + cityId +
-                " and " + COLUMN_OBJECT_VISIBLE + " = 1  order by " + COLUMN_OBJECT_NAME + " asc ", null);
+                " and " + COLUMN_OBJECT_VISIBLE + " = " + visible + "  order by " + COLUMN_OBJECT_NAME + " asc ", null);
 
         ArrayList<ObjectList> lstObjectList = new ArrayList<>();
 
@@ -233,8 +234,8 @@ public class DBHelper extends SQLiteOpenHelper {
 //        return objectsIds;
 //    }
 
-                //ROI (RouteObjectsInfo) - загальна модель екскурсійного об'єкту з обмеженим набором
-                // атрибутів, потрібних для прокладання маршруту
+    //ROI (RouteObjectsInfo) - загальна модель екскурсійного об'єкту з обмеженим набором
+    // атрибутів, потрібних для прокладання маршруту
     private ArrayList<RouteObjectsInfo> getROIFromCursor(Cursor userCursorObj) {
         ArrayList<RouteObjectsInfo> lstRouteObjectsInfos = new ArrayList<>();
 

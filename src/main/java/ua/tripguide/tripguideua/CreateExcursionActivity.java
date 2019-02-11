@@ -45,7 +45,7 @@ public class CreateExcursionActivity extends AppCompatActivity implements Number
 
         //об'єкт класу для роботи з бд
         DBHelper dbHelper = new DBHelper(getApplicationContext());
-        ArrayList<ObjectList> lstObjectList = dbHelper.getObjectsFromDB(cityId);
+        ArrayList<ObjectList> lstObjectList = dbHelper.getObjectsFromDB(cityId,false);
 
         llCreateExcurion = findViewById(R.id.ll_create_excursion_with_objects);
 

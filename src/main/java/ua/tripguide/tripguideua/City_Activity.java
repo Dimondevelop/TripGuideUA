@@ -13,8 +13,8 @@ import java.util.Objects;
 
 public class City_Activity extends AppCompatActivity {
 
-  private String CityName;
-  private int CityId;
+  private String cityName;
+  private int cityId;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +25,10 @@ public class City_Activity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowHomeEnabled(true);
 
     Intent intent = getIntent();
-    CityName = Objects.requireNonNull(intent.getExtras()).getString("cityName");
-    CityId = Objects.requireNonNull(intent.getExtras()).getInt("cityId");
+    cityName = Objects.requireNonNull(intent.getExtras()).getString("cityName");
+    cityId = Objects.requireNonNull(intent.getExtras()).getInt("cityId");
 
-    Objects.requireNonNull(getSupportActionBar()).setTitle("Обране місто - " + CityName);
+    Objects.requireNonNull(getSupportActionBar()).setTitle("Обране місто - " + cityName);
 
     LinearLayout chooseIndividual = findViewById(R.id.ll_choose_individual_id);
     LinearLayout chooseFromList = findViewById(R.id.ll_choose_from_list_id);
@@ -41,20 +41,20 @@ public class City_Activity extends AppCompatActivity {
         switch (view.getId()){
           case R.id.ll_choose_individual_id:
             Intent newExIntent = new Intent(vContext, ChooseIndividualActivity.class);
-            newExIntent.putExtra("cityName", CityName);
-            newExIntent.putExtra("cityId", CityId);
+            newExIntent.putExtra("cityName", cityName);
+            newExIntent.putExtra("cityId", cityId);
             vContext.startActivity(newExIntent);
             break;
           case R.id.ll_choose_from_list_id:
             Intent fromListIntent = new Intent(vContext, FromListActivity.class);
-            fromListIntent.putExtra("cityName", CityName);
-            fromListIntent.putExtra("cityId", CityId);
+            fromListIntent.putExtra("cityName", cityName);
+            fromListIntent.putExtra("cityId", cityId);
             vContext.startActivity(fromListIntent);
             break;
           case R.id.ll_create_excursion_id:
             Intent createExIntent = new Intent(vContext, CreateExcursionActivity.class);
-            createExIntent.putExtra("cityName", CityName);
-            createExIntent.putExtra("cityId", CityId);
+            createExIntent.putExtra("cityName", cityName);
+            createExIntent.putExtra("cityId", cityId);
             vContext.startActivity(createExIntent);
             break;
         }

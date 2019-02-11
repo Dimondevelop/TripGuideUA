@@ -31,4 +31,6 @@
     <string name="nature">Природа</string>
     <string name="museum">Музеї</string>
     <string name="custom_title">Оберіть типи екскурсії:</string>
+    <string name="brake_title">Перерив на перекус</string>
+    <string name="brake_description">В довготривалій екскурсії, внести до маршруту заклади, де можна поїсти та сходити в туалет</string>
 </resources>

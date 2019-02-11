@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.util.Log;
@@ -40,8 +39,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+import ua.tripguide.tripguideua.Models.ObjectList;
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.R;
 
@@ -55,10 +54,12 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> impleme
     private MarkerOptions markerOptions;
     private LatLng startLatLng, endLatLng;
 
+
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private int lstSize;
     private int countPlaceIds;
     private String data = "";
+
 
     private Context mContext;
 
@@ -81,7 +82,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> impleme
         this.lstSize = lstRouteObjectsInfos.size();
         this.DEFAULT_ZOOM = DEFAULT_ZOOM;
 
-
         for (int i = 0; i < lstSize; i++) {
             if (lstRouteObjectsInfos.get(i).getPlace_id() != null) {
                 place_ids.add(lstRouteObjectsInfos.get(i).getPlace_id());
@@ -90,6 +90,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> impleme
             }
         }
         countPlaceIds = place_ids.size();
+
+
     }
 
     @Override
@@ -319,7 +321,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> impleme
                         int i = 1;
                         if (arrayListLegsDistanceCount == 1)
                             i = 0;
-                        for (;i < arrayListLegsDistanceCount; i++) {
+                        for (; i < arrayListLegsDistanceCount; i++) {
                             markerOptions = new MarkerOptions().snippet("distance($%code#1)")
                                     .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Відстань: " + calculateDistance(Long.valueOf((String) arrayListLegsDistance.get(i)[0])) +
                                             "\nЧас: " + calculateTime(Long.valueOf((String) arrayListLegsDistance.get(i)[1])))))

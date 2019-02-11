@@ -17,7 +17,6 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -37,34 +36,28 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
     private static final String TAG = ChooseIndividualActivity.class.getSimpleName();
     Context mContext;
-    LinearLayout llCreateExcurion;
 
-    ArrayList<SpinnerList> typeOfExcursionList;
-    CheckBox checkBoxActual, checkBoxSightseeing, checkBoxAttractions, checkBoxArchitecture, checkBoxNature, checkBoxMuseum;
-    LinearLayout llActual, llSightseeing, llAttractions, llArchitecture, llNature, llMuseum;
+    int cityId;
+
+    ArrayList<SpinnerList> typeOfExcursionList, priceOfExcursionList, durationOfExursionList;
+    CheckBox checkBoxActual, checkBoxSightseeing, checkBoxAttractions, checkBoxArchitecture, checkBoxNature, checkBoxMuseum, chb_visible;
+    LinearLayout llCreateExcurion, llActual, llSightseeing, llAttractions, llArchitecture, llNature, llMuseum, ll_visible;
 
     ExcursionSpinnerAdapter spinnerOneAdapter;
     AlertDialog.Builder builder;
     AlertDialog alertDialog;
 
-    ArrayList<String> types;
-    ArrayList<String> typesNames;
+    ArrayList<String> types, typesNames;
 
     ArrayList<ObjectList> lstObjectList;
     ArrayList<RouteObjectsInfo> lstROI;
-    float[] coordinates_x;
-    float[] coordinates_y;
-    String[] titles;
-    String[] working_hours;
-    String[] place_ids;
+    float[] coordinates_x, coordinates_y;
+    String[] titles, working_hours, place_ids;
     int[] average_duration;
 
-    ArrayList<SpinnerList> priceOfExcursionList;
     SelectAgainSpinner spTypeSpinner;
-    Spinner spPriceSpinner;
-    Spinner spDurationSpinner;
-    CheckBox chb_visible;
-    LinearLayout ll_visible;
+    Spinner spPriceSpinner, spDurationSpinner;
+    boolean breakTime;
 
 
     @Override
@@ -76,7 +69,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String cityName = Objects.requireNonNull(intent.getExtras()).getString("cityName");
-        int cityId = Objects.requireNonNull(intent.getExtras()).getInt("cityId");
+        cityId = Objects.requireNonNull(intent.getExtras()).getInt("cityId");
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -84,7 +77,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
         //об'єкт класу для роботи з бд
         DBHelper dbHelper = new DBHelper(getApplicationContext());
-        lstObjectList = dbHelper.getObjectsFromDB(cityId);
+        lstObjectList = dbHelper.getObjectsFromDB(cityId, false);
 
 
         typeOfExcursionList = new ArrayList<>();
@@ -317,7 +310,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         spPriceSpinner.setPrompt("Оберіть бажану ціну екскурсії");
         spPriceSpinner.setAdapter(spinnerTwoAdapter);
 
-        ArrayList<SpinnerList> durationOfExursionList = new ArrayList<>();
+        durationOfExursionList = new ArrayList<>();
 
         durationOfExursionList.add(new SpinnerList("0", "Будь-яка",
                 "Не обмежувати маршрут за тривалістю", R.drawable.question));
@@ -344,13 +337,13 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         ll_visible.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!chb_visible.isChecked()) {
-
-                } else if (chb_visible.isChecked()) {
-
-                }
-
                 chb_visible.toggle();
+
+                if (chb_visible.isChecked()) {
+                    breakTime = true;
+                } else if (!chb_visible.isChecked()) {
+                    breakTime = false;
+                }
             }
         });
 
@@ -372,10 +365,10 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                                     lstObjectList.get(i).getWorking_hours(), lstObjectList.get(i).getAverage_duration(),
                                     (new LatLng(lstObjectList.get(i).getCoordinate_x(), lstObjectList.get(i).getCoordinate_y()))));
 
-                            Log.i(TAG, "ObjectList(debug): " + lstObjectList.get(i).getName_object()
-                                    + " \nТип: " + lstObjectList.get(i).getType_object()
-                                    + "\nЦіна: " + lstObjectList.get(i).getPrice()
-                                    + "\nТривалість: " + lstObjectList.get(i).getAverage_duration() + "хв");
+//                            Log.i(TAG, "ObjectList(debug): " + lstObjectList.get(i).getName_object()
+//                                    + " \nТип: " + lstObjectList.get(i).getType_object()
+//                                    + "\nЦіна: " + lstObjectList.get(i).getPrice()
+//                                    + "\nТривалість: " + lstObjectList.get(i).getAverage_duration() + "хв");
                         }
                     }
                 }
@@ -411,19 +404,21 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                 } else {
                     for (int i = 0; i < lstROI.size(); i++) {
                         countAvg += lstROI.get(i).getAverage_duration();
-                        Log.i(TAG, "LST(debug): " + lstROI.get(i).getTitle() + " - " + lstROI.get(i).getAverage_duration() + "хв");
+//                        Log.i(TAG, "LST(debug): " + lstROI.get(i).getTitle() + " - " + lstROI.get(i).getAverage_duration() + "хв");
                     }
                     int selectedMinutes = Integer.valueOf(spDurationSpinner.getSelectedItem().toString()) * 60;
-                    Log.i(TAG, "Всього хвилин(debug): " + countAvg + "хв id: " + spTypeSpinner.getSelectedItemId());
+//                    Log.i(TAG, "Всього хвилин(debug): " + countAvg + "хв id: " + spTypeSpinner.getSelectedItemId());
+
                     lstROI = new ArrayList<>(cutDownRoute(countAvg, selectedMinutes, lstROI));
-                    countAvg = 0;
-                    for (int i = 0; i < lstROI.size(); i++) {
-                        countAvg += lstROI.get(i).getAverage_duration();
-                        Log.i(TAG, "LST(debug2): " + lstROI.get(i).getTitle() + " - " + lstROI.get(i).getAverage_duration() + "хв");
-                    }
-                    Log.i(TAG, "Всього хвилин(debug2): " + countAvg + "хв id: " + spTypeSpinner.getSelectedItemId());
-                    if (types != null)
-                        Log.i(TAG, "ТИПИ(debug2): " + Arrays.toString(types.toArray()));
+//                    countAvg = 0;
+//                    for (int i = 0; i < lstROI.size(); i++) {
+//                        countAvg += lstROI.get(i).getAverage_duration();
+//                        Log.i(TAG, "LST(debug2): " + lstROI.get(i).getTitle() + " - " + lstROI.get(i).getAverage_duration() + "хв");
+//                    }
+//
+//                    Log.i(TAG, "Всього хвилин(debug2): " + countAvg + "хв id: " + spTypeSpinner.getSelectedItemId());
+//                    if (types != null)
+//                        Log.i(TAG, "ТИПИ(debug2): " + Arrays.toString(types.toArray()));
 
                     int countObjects = lstROI.size();
                     coordinates_x = new float[countObjects];
@@ -444,6 +439,8 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
                     Context vContext = v.getContext();
                     Intent intent = new Intent(vContext, RoutesActivity.class);
+                    intent.putExtra("breakTime", breakTime);
+                    intent.putExtra("cityId", cityId);
                     intent.putExtra("coordinates_x", coordinates_x);
                     intent.putExtra("coordinates_y", coordinates_y);
                     intent.putExtra("titles", titles);
