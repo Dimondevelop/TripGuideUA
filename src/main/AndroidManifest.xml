@@ -38,12 +38,14 @@
         <activity
             android:name=".City_Activity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ChooseIndividualActivity" />
+        <activity android:name=".ChooseIndividualActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CreateExcursionActivity"
             android:label="@string/choose_objects"
             android:screenOrientation="portrait" />
         <activity android:name=".FromListActivity" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

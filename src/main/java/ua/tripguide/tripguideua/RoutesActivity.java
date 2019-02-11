@@ -49,8 +49,9 @@ import ua.tripguide.tripguideua.Adapters.PopupAdapter;
 public class RoutesActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnInfoWindowClickListener {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        GoogleMap.OnInfoWindowClickListener,
+        OnMapReadyCallback {
 
     private static final String TAG = RoutesActivity.class.getSimpleName();
     private GoogleMap mMap;
@@ -256,6 +257,7 @@ public class RoutesActivity extends AppCompatActivity implements
 //|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
         mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -484,4 +486,6 @@ public class RoutesActivity extends AppCompatActivity implements
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
+
+
 }

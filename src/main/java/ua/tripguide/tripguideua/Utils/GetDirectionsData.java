@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
@@ -39,16 +40,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.R;
 
 import static android.support.constraint.Constraints.TAG;
 
-public class GetDirectionsData extends AsyncTask<Object, String, String> {
+public class GetDirectionsData extends AsyncTask<Object, String, String> implements GoogleMap.OnCameraMoveListener {
 
     private GoogleMap mMap;
     private ArrayList<RouteObjectsInfo> lstRouteObjectsInfos;
+    private int arrayListLegsDistanceCount;
+    private MarkerOptions markerOptions;
     private LatLng startLatLng, endLatLng;
 
     private ArrayList<LatLng> latLngs = new ArrayList<>();
@@ -64,6 +68,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
     private List<List<List<LatLng>>> lstLatLngsUpper = new ArrayList<>();
     private List<List<LatLng>> lstLatLngsInner;
+
+    private Marker[] mDistances;
 
     private int height = 15;
     private int width = 15;
@@ -118,6 +124,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        mMap.setOnCameraMoveListener(this);
 
 //        if (s.length() > 4000) {
 //            Log.v("SOFT ", "sb.length = " + s.length());
@@ -282,7 +289,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                         for (int i = 0; i < countPlaceIds; i++) {
                             avg_count += average_duration.get(i);
                             mMap.addMarker(new MarkerOptions().zIndex(5).position(myPlace[i].getLatLng()).snippet("Графік роботи : " + working_hours.get(i) +
-                                    "\nТривалість екскурсії: ≈ " + calculateTime(average_duration.get(i)*60)) //значення average_duration повертається в хв, а функція приймає значення секкунд, тому множимо на 60
+                                    "\nТривалість екскурсії: ≈ " + calculateTime(average_duration.get(i) * 60)) //значення average_duration повертається в хв, а функція приймає значення секкунд, тому множимо на 60
                                     .title(myPlace[i].getName().toString()).icon(BitmapDescriptorFactory.fromBitmap(waypointMarker)).anchor(0.5f, 0.5f));
                         }
 
@@ -292,7 +299,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
 
                         List<List<LatLng>> latLngsMiddle = new ArrayList<>();
-                        List<LatLng>  latLngsInner;
+                        List<LatLng> latLngsInner;
                         for (int i = 0; i < lstLatLngsUpper.size(); i++) {
                             latLngsInner = new ArrayList<>();
                             for (int j = 0; j < lstLatLngsUpper.get(i).size(); j++) {
@@ -307,21 +314,24 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 //                            }
 //                        }
 
-
-                        MarkerOptions markerOptions;
-                        for (int i = 1; i < arrayListLegsDistance.size(); i++) {
-
+                        arrayListLegsDistanceCount = arrayListLegsDistance.size();
+                        mDistances = new Marker[arrayListLegsDistanceCount];
+                        int i = 1;
+                        if (arrayListLegsDistanceCount == 1)
+                            i = 0;
+                        for (;i < arrayListLegsDistanceCount; i++) {
                             markerOptions = new MarkerOptions().snippet("distance($%code#1)")
                                     .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Відстань: " + calculateDistance(Long.valueOf((String) arrayListLegsDistance.get(i)[0])) +
                                             "\nЧас: " + calculateTime(Long.valueOf((String) arrayListLegsDistance.get(i)[1])))))
-                                    .position(findHalfRoute(latLngsMiddle.get(i),Double.valueOf((String) arrayListLegsDistance.get(i)[0])/2))
+                                    .position(findHalfRoute(latLngsMiddle.get(i), Double.valueOf((String) arrayListLegsDistance.get(i)[0]) / 2))
                                     .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 //                                    .anchor(iconFactory.getAnchorU()-0.1f, iconFactory.getAnchorV()-0.01f);
-                            mMap.addMarker(markerOptions);
+                            mDistances[i] = mMap.addMarker(markerOptions);
                         }
 
                         mMap.addMarker(new MarkerOptions().snippet("distance($%code#1)").position(latLngs.get(0)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerStart)));
                         mMap.addMarker(new MarkerOptions().snippet("distance($%code#1)").position(latLngs.get(latLngs.size() - 1)).icon(BitmapDescriptorFactory.fromBitmap(middleMarkerFinish)));
+
 
 //                        double fullDistance = 380;
 //
@@ -333,7 +343,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 ////                                    .position(SphericalUtil.interpolate(myPlace[i - 1].getLatLng(), myPlace[i].getLatLng(), 0.5))
 //                                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 //                        mMap.addMarker(markerOptions);
-
 
 
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), DEFAULT_ZOOM), 50, null);
@@ -352,20 +361,40 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         super.onPostExecute(s);
     }
 
+    @Override
+    public void onCameraMove() {
+        if (mMap.getCameraPosition().zoom < 16) {
+            for (int i = 1; i < arrayListLegsDistanceCount; i++) {
+                if (mDistances.length > 0) {
+                    if (mDistances[i].isVisible())
+                        mDistances[i].setVisible(false);
+                }
+            }
+        }
+        if (mMap.getCameraPosition().zoom >= 16) {
+            for (int i = 1; i < arrayListLegsDistanceCount; i++) {
+                if (mDistances.length > 0) {
+                    if (!mDistances[i].isVisible())
+                        mDistances[i].setVisible(true);
+                }
+            }
+        }
+    }
 
-    private static LatLng findHalfRoute (List<LatLng> latLngsMiddle, double halfDistance){
+
+    private static LatLng findHalfRoute(List<LatLng> latLngsMiddle, double halfDistance) {
         double mDistance = 0;
         LatLng halfPoint = latLngsMiddle.get(0);
 
-        for (int i = 1; i < latLngsMiddle.size();i++) {
+        for (int i = 0; i < latLngsMiddle.size() - 1; i++) {
             if (mDistance < halfDistance) {
-                mDistance += SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i - 1),latLngsMiddle.get(i));
+                mDistance += SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i), latLngsMiddle.get(i + 1));
             }
-            if (mDistance > halfDistance){
-                double distanceBetween = SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i - 1),latLngsMiddle.get(i));
-                double dif = distanceBetween-(mDistance - halfDistance);
-                double fraction = 100/mDistance*dif/100;
-                halfPoint = SphericalUtil.interpolate(latLngsMiddle.get(i - 1),latLngsMiddle.get(i), fraction);
+            if (mDistance > halfDistance) {
+                double distanceBetween = SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i), latLngsMiddle.get(i + 1));
+                double dif = distanceBetween - (mDistance - halfDistance);
+                double fraction = 100 / mDistance * dif / 100;
+                halfPoint = SphericalUtil.interpolate(latLngsMiddle.get(i), latLngsMiddle.get(i + 1), fraction);
 //                halfPoint = findMiddlePoint(latLngsMiddle.get(i - 1),latLngsMiddle.get(i),mDistance,halfDistance);
                 //DEBUG
 //                mDistance -= SphericalUtil.computeDistanceBetween(latLngsMiddle.get(i),halfPoint); //Дистанція до повертаємої точки
@@ -404,7 +433,7 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         long minutes = seconds % 3600 / 60;
         long hours = seconds % 86400 / 3600;
 
-        if (hours == 0 && minutes == 0 )
+        if (hours == 0 && minutes == 0)
             return 1 + " хв.";
         else if (hours == 0)
             return minutes + " хв.";

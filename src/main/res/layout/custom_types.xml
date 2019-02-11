@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/custom_title"
+        android:textColor="@color/colorBlackLight"
+        android:textSize="25sp" />
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_actual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_actual"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:onClick="checkBoxes"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/actual"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_sightseeing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_sightseeing"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/sightseeing"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_attractions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_attractions"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/attractions"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_architecture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_architecture"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/architecture"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_nature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_nature"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/nature"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_checkbox_museum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="false"
+        android:focusable="false"
+        android:padding="10dp">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_museum"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:checkable="true"
+            android:focusable="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:clickable="false"
+            android:scaleX="2.4"
+            android:scaleY="2.4"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="12sp"
+            app:buttonTint="@color/colorBlackLight" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:text="@string/museum"
+            android:textColor="@color/colorBlackLight"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -11,14 +11,18 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import ua.tripguide.tripguideua.Adapters.ExcursionSpinnerAdapter;
@@ -26,11 +30,25 @@ import ua.tripguide.tripguideua.Models.ObjectList;
 import ua.tripguide.tripguideua.Models.RouteObjectsInfo;
 import ua.tripguide.tripguideua.Models.SpinnerList;
 import ua.tripguide.tripguideua.Utils.DBHelper;
+import ua.tripguide.tripguideua.Utils.SelectAgainSpinner;
+import ua.tripguide.tripguideua.Utils.UtilMethods;
 
 public class ChooseIndividualActivity extends AppCompatActivity {
 
     private static final String TAG = ChooseIndividualActivity.class.getSimpleName();
+    Context mContext;
     LinearLayout llCreateExcurion;
+
+    ArrayList<SpinnerList> typeOfExcursionList;
+    CheckBox checkBoxActual, checkBoxSightseeing, checkBoxAttractions, checkBoxArchitecture, checkBoxNature, checkBoxMuseum;
+    LinearLayout llActual, llSightseeing, llAttractions, llArchitecture, llNature, llMuseum;
+
+    ExcursionSpinnerAdapter spinnerOneAdapter;
+    AlertDialog.Builder builder;
+    AlertDialog alertDialog;
+
+    ArrayList<String> types;
+    ArrayList<String> typesNames;
 
     ArrayList<ObjectList> lstObjectList;
     ArrayList<RouteObjectsInfo> lstROI;
@@ -42,7 +60,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
     int[] average_duration;
 
     ArrayList<SpinnerList> priceOfExcursionList;
-    Spinner spTypeSpinner;
+    SelectAgainSpinner spTypeSpinner;
     Spinner spPriceSpinner;
     Spinner spDurationSpinner;
     CheckBox chb_visible;
@@ -53,6 +71,8 @@ public class ChooseIndividualActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_individual);
+
+        mContext = ChooseIndividualActivity.this;
 
         Intent intent = getIntent();
         String cityName = Objects.requireNonNull(intent.getExtras()).getString("cityName");
@@ -67,13 +87,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         lstObjectList = dbHelper.getObjectsFromDB(cityId);
 
 
-//        try {
-//            iv_test.setImageResource(R.drawable.class.getField("chernigiv").getInt(getResources()));
-//        } catch (IllegalAccessException | NoSuchFieldException e) {
-//            e.printStackTrace();
-//        }
-
-        ArrayList<SpinnerList> typeOfExcursionList = new ArrayList<>();
+        typeOfExcursionList = new ArrayList<>();
 
         typeOfExcursionList.add(new SpinnerList("актуальний", "Актуальна",
                 "Прокласти маршрут екскурсії з найбільш актуальними в даний період місцями", R.drawable.actual_blue));
@@ -95,10 +109,196 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                 "Прокласти маршрут з додаванням до нього місць різних типів, обраних користувачем", R.drawable.custom));
 
         spTypeSpinner = findViewById(R.id.sp_type_spinner);
-        ExcursionSpinnerAdapter spinnerOneAdapter = new ExcursionSpinnerAdapter(this, typeOfExcursionList);
+        spinnerOneAdapter = new ExcursionSpinnerAdapter(this, typeOfExcursionList);
         spTypeSpinner.setPrompt("Оберіть бажаний тип екскурсії");
 //        spTypeSpinner.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_ATOP);
         spTypeSpinner.setAdapter(spinnerOneAdapter);
+        spTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (id != 6) {
+                    if (types != null && typesNames != null) {
+                        types.clear();
+                        types = null;
+                        typesNames.clear();
+                        typesNames = null;
+                    }
+                }
+                if (id == 6) {
+                    View checkBoxView = View.inflate(mContext, R.layout.custom_types, null);
+
+                    builder = new AlertDialog.Builder(mContext);
+                    checkBoxActual = checkBoxView.findViewById(R.id.checkbox_actual);
+                    checkBoxSightseeing = checkBoxView.findViewById(R.id.checkbox_sightseeing);
+                    checkBoxAttractions = checkBoxView.findViewById(R.id.checkbox_attractions);
+                    checkBoxArchitecture = checkBoxView.findViewById(R.id.checkbox_architecture);
+                    checkBoxNature = checkBoxView.findViewById(R.id.checkbox_nature);
+                    checkBoxMuseum = checkBoxView.findViewById(R.id.checkbox_museum);
+
+                    llActual = checkBoxView.findViewById(R.id.ll_checkbox_actual);
+                    llSightseeing = checkBoxView.findViewById(R.id.ll_checkbox_sightseeing);
+                    llAttractions = checkBoxView.findViewById(R.id.ll_checkbox_attractions);
+                    llArchitecture = checkBoxView.findViewById(R.id.ll_checkbox_architecture);
+                    llNature = checkBoxView.findViewById(R.id.ll_checkbox_nature);
+                    llMuseum = checkBoxView.findViewById(R.id.ll_checkbox_museum);
+
+                    if (types != null && typesNames != null) {
+                        types.clear();
+                        types = null;
+                        typesNames.clear();
+                        typesNames = null;
+                    }
+                    types = new ArrayList<>();
+                    typesNames = new ArrayList<>();
+
+                    View.OnClickListener checkBoxes = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            switch (v.getId()) {
+                                case R.id.ll_checkbox_actual:
+                                    checkBoxActual.toggle();
+                                    if (checkBoxActual.isChecked()) {
+                                        types.add(typeOfExcursionList.get(0).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(0).getSpinnerName());
+                                    } else if (!checkBoxActual.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(0).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(0).getSpinnerName());
+                                    }
+                                    break;
+                                case R.id.ll_checkbox_sightseeing:
+                                    checkBoxSightseeing.toggle();
+                                    if (checkBoxSightseeing.isChecked()) {
+                                        types.add(typeOfExcursionList.get(1).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(1).getSpinnerName());
+                                    } else if (!checkBoxSightseeing.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(1).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(1).getSpinnerName());
+                                    }
+                                    break;
+                                case R.id.ll_checkbox_attractions:
+                                    checkBoxAttractions.toggle();
+                                    if (checkBoxAttractions.isChecked()) {
+                                        types.add(typeOfExcursionList.get(2).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(2).getSpinnerName());
+                                    } else if (!checkBoxAttractions.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(2).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(2).getSpinnerName());
+                                    }
+                                    break;
+                                case R.id.ll_checkbox_architecture:
+                                    checkBoxArchitecture.toggle();
+                                    if (checkBoxArchitecture.isChecked()) {
+                                        types.add(typeOfExcursionList.get(3).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(3).getSpinnerName());
+                                    } else if (!checkBoxArchitecture.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(3).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(3).getSpinnerName());
+                                    }
+                                    break;
+                                case R.id.ll_checkbox_nature:
+                                    checkBoxNature.toggle();
+                                    if (checkBoxNature.isChecked()) {
+                                        types.add(typeOfExcursionList.get(4).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(4).getSpinnerName());
+                                    } else if (!checkBoxNature.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(4).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(4).getSpinnerName());
+                                    }
+
+                                    break;
+                                case R.id.ll_checkbox_museum:
+                                    checkBoxMuseum.toggle();
+                                    if (checkBoxMuseum.isChecked()) {
+                                        types.add(typeOfExcursionList.get(5).getSpinnerValue());
+                                        typesNames.add(typeOfExcursionList.get(5).getSpinnerName());
+                                    } else if (!checkBoxMuseum.isChecked()) {
+                                        types.remove(typeOfExcursionList.get(5).getSpinnerValue());
+                                        typesNames.remove(typeOfExcursionList.get(5).getSpinnerName());
+                                    }
+                                    break;
+                            }
+                        }
+                    };
+
+                    llActual.setOnClickListener(checkBoxes);
+                    llSightseeing.setOnClickListener(checkBoxes);
+                    llAttractions.setOnClickListener(checkBoxes);
+                    llArchitecture.setOnClickListener(checkBoxes);
+                    llNature.setOnClickListener(checkBoxes);
+                    llMuseum.setOnClickListener(checkBoxes);
+
+
+                    builder.setOnCancelListener(
+                            new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    dialog.cancel();
+                                    if (types != null && typesNames != null) {
+                                        types.clear();
+                                        typesNames.clear();
+                                    }
+                                    spTypeSpinner.setSelection(0);
+                                }
+                            }
+                    );
+
+                    builder.setNegativeButton("Cкасувати", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.setPositiveButton("Обрати", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            spinnerOneAdapter.setDescription("");
+                            if (types == null || types.isEmpty()) {
+                                dialog.cancel();
+                            } else {
+                                spinnerOneAdapter.setName("Обрано типи: ");
+
+                                TextView tvSpinnerDescription = spTypeSpinner.findViewById(R.id.tv_spinner_description);
+                                tvSpinnerDescription.setText(UtilMethods.listToFormatString(typesNames));
+                            }
+                        }
+                    });
+
+                    builder.setView(checkBoxView);
+
+                    alertDialog = builder.create();
+                    alertDialog.show();
+
+                    Button buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                    if (buttonPositive != null) {
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(10, 5, 10, 10);
+
+                        buttonPositive.setTextColor(Color.rgb(255, 255, 255));
+                        buttonPositive.setTextSize(18);
+                        buttonPositive.setGravity(Gravity.CENTER);
+                        buttonPositive.setLayoutParams(params);
+                        buttonPositive.setBackground(getResources().getDrawable(R.drawable.buttonshape_positive));
+                    }
+
+                    Button buttonNegative = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+                    if (buttonNegative != null) {
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(10, 5, 10, 10);
+
+                        buttonNegative.setTextColor(Color.rgb(255, 255, 255));
+                        buttonNegative.setTextSize(18);
+                        buttonNegative.setGravity(Gravity.CENTER);
+                        buttonNegative.setLayoutParams(params);
+                        buttonNegative.setBackground(getResources().getDrawable(R.drawable.buttonshape_negative));
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         priceOfExcursionList = new ArrayList<>();
@@ -154,7 +354,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
             }
         });
 
-
         llCreateExcurion = findViewById(R.id.ll_create_individual_excursion);
 
         llCreateExcurion.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +365,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
 
                 for (int i = 0; i < lstObjectList.size(); i++) {
-                    if (lstObjectList.get(i).getType_object().contains(spTypeSpinner.getSelectedItem().toString())) {
+                    if (lstObjectList.get(i).getType_object().contains(spTypeSpinner.getSelectedItem().toString()) || (types != null && UtilMethods.containsArray(lstObjectList.get(i).getType_object(), types))) {
                         if (lstObjectList.get(i).getPrice() <= selectedPrice) {
 
                             lstROI.add(new RouteObjectsInfo(lstObjectList.get(i).getPlace_id(), lstObjectList.get(i).getName_object(),
@@ -182,9 +381,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                 }
                 int countAvg = 0;
 
-                if (lstROI.isEmpty()) {
-
-                    Context mContext = ChooseIndividualActivity.this;
+                if (lstROI != null && lstROI.isEmpty() && types != null && types.isEmpty()) {
 
                     TextView title = new TextView(mContext);
                     title.setText("Увага!");
@@ -211,8 +408,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                     if (messageView != null) {
                         messageView.setGravity(Gravity.CENTER);
                     }
-
-
                 } else {
                     for (int i = 0; i < lstROI.size(); i++) {
                         countAvg += lstROI.get(i).getAverage_duration();
@@ -227,6 +422,8 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                         Log.i(TAG, "LST(debug2): " + lstROI.get(i).getTitle() + " - " + lstROI.get(i).getAverage_duration() + "хв");
                     }
                     Log.i(TAG, "Всього хвилин(debug2): " + countAvg + "хв id: " + spTypeSpinner.getSelectedItemId());
+                    if (types != null)
+                        Log.i(TAG, "ТИПИ(debug2): " + Arrays.toString(types.toArray()));
 
                     int countObjects = lstROI.size();
                     coordinates_x = new float[countObjects];
@@ -259,13 +456,20 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    protected void onDestroy() {
+        if (alertDialog != null)
+            alertDialog.dismiss();
+        super.onDestroy();
+    }
+
     private ArrayList<RouteObjectsInfo> cutDownRoute(int countMinutes, int selectedMinutes, ArrayList<RouteObjectsInfo> routeObjectsInfos) {
         if (selectedMinutes == 0) {
             return routeObjectsInfos;
         } else if (countMinutes > selectedMinutes) {
             routeObjectsInfos = new ArrayList<>(RoutesActivity.sortLatLng(routeObjectsInfos));
             routeObjectsInfos.remove(routeObjectsInfos.size() - 1);
-
 
             countMinutes = 0;
             for (int i = 0; i < routeObjectsInfos.size(); i++) {

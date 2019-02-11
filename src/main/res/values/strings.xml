@@ -16,7 +16,7 @@
     <string name="working_hours">Графік роботи:</string>
     <string name="type_of">Тип:</string>
     <string name="on_map">на карті</string>
-    <string name="title_activity_routes">Прокледений маршрут</string>
+    <string name="title_activity_routes">Прокладений маршрут</string>
     <string name="test">ТестГолоп</string>
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
     <string name="permission_required_toast">Location permission is required for this demo.</string>
@@ -24,4 +24,11 @@
     <string name="choose_objects">Оберіть об\'єкти</string>
     <string name="city_name">Назва міста</string>
     <string name="create_route">Прокласти маршрут</string>
+    <string name="actual">Актуальна</string>
+    <string name="sightseeing">Оглядова</string>
+    <string name="attractions">Пам\'ятки</string>
+    <string name="architecture">Архітектура</string>
+    <string name="nature">Природа</string>
+    <string name="museum">Музеї</string>
+    <string name="custom_title">Оберіть типи екскурсії:</string>
 </resources>

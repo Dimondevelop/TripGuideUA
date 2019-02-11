@@ -42,7 +42,7 @@
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/border" />
 
-                <Spinner
+                <ua.tripguide.tripguideua.Utils.SelectAgainSpinner
                     android:id="@+id/sp_type_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
