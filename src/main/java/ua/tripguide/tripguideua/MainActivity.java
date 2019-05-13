@@ -57,35 +57,35 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.action_settings:
-                Toast.makeText(MainActivity.this, getString(R.string.action_settings), Toast.LENGTH_SHORT).show();
-                break;
-//            case R.id.action_mail:
-//                Toast.makeText(MainActivity.this, getString(R.string.action_email), Toast.LENGTH_SHORT).show();
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        switch (id) {
+//            case R.id.action_settings:
+//                Toast.makeText(MainActivity.this, getString(R.string.action_settings), Toast.LENGTH_SHORT).show();
 //                break;
-            case R.id.action_menu_SuggestAnObject:
-                Toast.makeText(MainActivity.this, getString(R.string.action_menu_SuggestAnObject), Toast.LENGTH_SHORT).show();
-                break;
-//            case R.id.action_menu_2:
-//                Toast.makeText(MainActivity.this, getString(R.string.action_menu_2), Toast.LENGTH_SHORT).show();
+////            case R.id.action_mail:
+////                Toast.makeText(MainActivity.this, getString(R.string.action_email), Toast.LENGTH_SHORT).show();
+////                break;
+//            case R.id.action_menu_SuggestAnObject:
+//                Toast.makeText(MainActivity.this, getString(R.string.action_menu_SuggestAnObject), Toast.LENGTH_SHORT).show();
 //                break;
-//            case R.id.action_menu_3:
-//                Toast.makeText(MainActivity.this, getString(R.string.action_menu_3), Toast.LENGTH_SHORT).show();
-//                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+////            case R.id.action_menu_2:
+////                Toast.makeText(MainActivity.this, getString(R.string.action_menu_2), Toast.LENGTH_SHORT).show();
+////                break;
+////            case R.id.action_menu_3:
+////                Toast.makeText(MainActivity.this, getString(R.string.action_menu_3), Toast.LENGTH_SHORT).show();
+////                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 }
 
 

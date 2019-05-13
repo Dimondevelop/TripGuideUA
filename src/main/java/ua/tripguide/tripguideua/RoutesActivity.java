@@ -19,15 +19,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -59,20 +56,12 @@ public class RoutesActivity extends AppCompatActivity implements
     private static final String TAG = RoutesActivity.class.getSimpleName();
     private GoogleMap mMap;
     LocationManager manager;
-    private CameraPosition mCameraPosition;
 
     RequestBuilder requestBuilder;
 
     Context mContext = this;
 
-    private DBHelper dbHelper;
-    private ArrayList<ObjectList> lstObjectBreakList;
-
     private Location mLastKnownLocation;
-
-    // The entry points to the Places API.
-    private GeoDataClient mGeoDataClient;
-    private PlaceDetectionClient mPlaceDetectionClient;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -94,6 +83,7 @@ public class RoutesActivity extends AppCompatActivity implements
     String[] titles;
     String[] working_hours;
     int[] average_duration;
+    int[] price;
 
     ArrayList<RouteObjectsInfo> lstRouteObjectsInfos = new ArrayList<>();
 
@@ -108,12 +98,6 @@ public class RoutesActivity extends AppCompatActivity implements
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        // Construct a GeoDataClient.
-        mGeoDataClient = Places.getGeoDataClient(mContext);
-
-        // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(mContext);
-
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext);
 
@@ -126,6 +110,7 @@ public class RoutesActivity extends AppCompatActivity implements
         titles = Objects.requireNonNull(intent.getExtras()).getStringArray("titles");
         working_hours = Objects.requireNonNull(intent.getExtras()).getStringArray("working_hours");
         average_duration = Objects.requireNonNull(intent.getExtras()).getIntArray("average_duration");
+        price = Objects.requireNonNull(intent.getExtras()).getIntArray("price");
 
         if (coordinates_x != null && coordinates_y != null) {
             countLatLngs = coordinates_x.length;
@@ -136,7 +121,8 @@ public class RoutesActivity extends AppCompatActivity implements
         }
 
         for (int i = 0; i < countLatLngs; i++) {
-            lstRouteObjectsInfos.add(new RouteObjectsInfo(place_ids[i], titles[i], Objects.requireNonNull(working_hours)[i], Objects.requireNonNull(average_duration)[i], latLngs[i]));
+            lstRouteObjectsInfos.add(new RouteObjectsInfo(place_ids[i], titles[i], Objects.requireNonNull(working_hours)[i],
+                    Objects.requireNonNull(average_duration)[i], Objects.requireNonNull(price)[i], latLngs[i]));
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -154,30 +140,23 @@ public class RoutesActivity extends AppCompatActivity implements
     public static ArrayList<RouteObjectsInfo> sortLatLng(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
         int count = routeObjectsInfoList.size();
         int index = 1;
-        double[] distances = new double[count - 1];
+        int lastIndex = count - 1;
+        double[] distances = new double[lastIndex];
 
-//        AB = √(xb - xa)**2 + (yb - ya)**2 - формула відстані між точками
         for (int i = 0; i < count - 1; i++) {
-//            distances[i] = Math.sqrt(Math.pow(routeObjectsInfoList.get(0).getLatLng().latitude - routeObjectsInfoList.get(i + 1).getLatLng().latitude, 2)
-//                    + Math.pow(routeObjectsInfoList.get(0).getLatLng().longitude - routeObjectsInfoList.get(i + 1).getLatLng().longitude, 2));
             distances[i] = SphericalUtil.computeDistanceBetween(routeObjectsInfoList.get(0).getLatLng(), routeObjectsInfoList.get(i + 1).getLatLng());
         }
 
         double temp = distances[0];
-        for (int i = 1; i < count - 1; i++) {
+        for (int i = 1; i < lastIndex; i++) {
             if (temp < distances[i]) {
                 temp = distances[i];
                 index = i + 1;
             }
         }
-
-        RouteObjectsInfo tempROI = new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
-                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getAverage_duration(), routeObjectsInfoList.get(count - 1).getLatLng());
-
-        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(routeObjectsInfoList.get(index).getPlace_id(), routeObjectsInfoList.get(index).getTitle(),
-                routeObjectsInfoList.get(index).getWorking_hour(), routeObjectsInfoList.get(index).getAverage_duration(), routeObjectsInfoList.get(index).getLatLng()));
-
-        routeObjectsInfoList.set(index, new RouteObjectsInfo(tempROI.getPlace_id(), tempROI.getTitle(), tempROI.getWorking_hour(), tempROI.getAverage_duration(), tempROI.getLatLng()));
+        RouteObjectsInfo tempLastROI = new RouteObjectsInfo(routeObjectsInfoList.get(lastIndex));
+        routeObjectsInfoList.set(lastIndex, new RouteObjectsInfo(routeObjectsInfoList.get(index)));
+        routeObjectsInfoList.set(index, new RouteObjectsInfo(tempLastROI));
 
         return routeObjectsInfoList;
     }
@@ -185,28 +164,21 @@ public class RoutesActivity extends AppCompatActivity implements
     private ArrayList<RouteObjectsInfo> doubleSort(ArrayList<RouteObjectsInfo> routeObjectsInfoList) {
 
         int count = routeObjectsInfoList.size();
+        int lastIndex = count - 1;
 
         routeObjectsInfoList = new ArrayList<>(RoutesActivity.sortLatLng(routeObjectsInfoList));
 
-        RouteObjectsInfo temp_before = new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
-                routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getAverage_duration(), routeObjectsInfoList.get(0).getLatLng());
-
-        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
-                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getAverage_duration(), routeObjectsInfoList.get(count - 1).getLatLng()));
-
-        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(temp_before.getPlace_id(), temp_before.getTitle(),
-                temp_before.getWorking_hour(), temp_before.getAverage_duration(), temp_before.getLatLng()));
+        RouteObjectsInfo temp_before = new RouteObjectsInfo(routeObjectsInfoList.get(0));
+        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(lastIndex)));
+        routeObjectsInfoList.set(lastIndex, new RouteObjectsInfo(temp_before));
 
         routeObjectsInfoList = new ArrayList<>(sortLatLng(routeObjectsInfoList));
+        RouteObjectsInfo temp_after = new RouteObjectsInfo(routeObjectsInfoList.get(0));
 
-        RouteObjectsInfo temp_after = new RouteObjectsInfo(routeObjectsInfoList.get(0).getPlace_id(), routeObjectsInfoList.get(0).getTitle(),
-                routeObjectsInfoList.get(0).getWorking_hour(), routeObjectsInfoList.get(0).getAverage_duration(), routeObjectsInfoList.get(0).getLatLng());
+        routeObjectsInfoList.get(0).setPlace_id(routeObjectsInfoList.get(lastIndex).getPlace_id());
+        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(lastIndex)));
 
-        routeObjectsInfoList.get(0).setPlace_id(routeObjectsInfoList.get(count - 1).getPlace_id());
-        routeObjectsInfoList.set(0, new RouteObjectsInfo(routeObjectsInfoList.get(count - 1).getPlace_id(), routeObjectsInfoList.get(count - 1).getTitle(),
-                routeObjectsInfoList.get(count - 1).getWorking_hour(), routeObjectsInfoList.get(count - 1).getAverage_duration(), routeObjectsInfoList.get(count - 1).getLatLng()));
-
-        routeObjectsInfoList.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getAverage_duration(), temp_after.getLatLng()));
+        routeObjectsInfoList.set(lastIndex, new RouteObjectsInfo(temp_after));
 
         return routeObjectsInfoList;
     }
@@ -230,8 +202,8 @@ public class RoutesActivity extends AppCompatActivity implements
         enableMyLocation();
 
         if (breakTime){
-            dbHelper = new DBHelper(mContext);
-            lstObjectBreakList = dbHelper.getObjectsFromDB(cityId, true);
+            DBHelper dbHelper = new DBHelper(mContext);
+            ArrayList<ObjectList> lstObjectBreakList = dbHelper.getObjectsFromDB(cityId, true);
 
             lstRouteObjectsInfos = doubleSort(lstRouteObjectsInfos);
             int countAvg = 0;
@@ -246,9 +218,6 @@ public class RoutesActivity extends AppCompatActivity implements
         } else {
             lstRouteObjectsInfos = doubleSort(lstRouteObjectsInfos);
         }
-
-
-
 
         requestBuilder = new RequestBuilder();
         String url = requestBuilder.buildUrl(lstRouteObjectsInfos);
@@ -382,21 +351,17 @@ public class RoutesActivity extends AppCompatActivity implements
 
                             ArrayList<RouteObjectsInfo> lstRouteObjectsInfosWithLocation = new ArrayList<>(lstRouteObjectsInfos);
 
-                            lstRouteObjectsInfosWithLocation.add(new RouteObjectsInfo(null, "Моє місцезнаходження", "", 0,
+                            lstRouteObjectsInfosWithLocation.add(new RouteObjectsInfo(null, "Моє місцезнаходження", "", 0,0,
                                     new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
 
                             int count = lstRouteObjectsInfosWithLocation.size();
 
-                            RouteObjectsInfo temp_after = new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(0).getPlace_id(), lstRouteObjectsInfosWithLocation.get(0).getTitle(),
-                                    lstRouteObjectsInfosWithLocation.get(0).getWorking_hour(), lstRouteObjectsInfosWithLocation.get(0).getAverage_duration(), lstRouteObjectsInfosWithLocation.get(0).getLatLng());
-
-                            lstRouteObjectsInfosWithLocation.set(0, new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(count - 1).getPlace_id(), lstRouteObjectsInfosWithLocation.get(count - 1).getTitle(),
-                                    lstRouteObjectsInfosWithLocation.get(count - 1).getWorking_hour(), lstRouteObjectsInfosWithLocation.get(count - 1).getAverage_duration(), lstRouteObjectsInfosWithLocation.get(count - 1).getLatLng()));
-
-                            lstRouteObjectsInfosWithLocation.set(count - 1, new RouteObjectsInfo(temp_after.getPlace_id(), temp_after.getTitle(), temp_after.getWorking_hour(), temp_after.getAverage_duration(), temp_after.getLatLng()));
-
+                            RouteObjectsInfo temp_after = new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(0));
+                            lstRouteObjectsInfosWithLocation.set(0, new RouteObjectsInfo(lstRouteObjectsInfosWithLocation.get(count - 1)));
+                            lstRouteObjectsInfosWithLocation.set(count - 1, new RouteObjectsInfo(temp_after));
 
                             mMap.clear();
+
                             String urlNew = requestBuilder.buildUrl(sortLatLng(lstRouteObjectsInfosWithLocation));
 
                             GetDirectionsData getDirectionsData = new GetDirectionsData(mContext, lstRouteObjectsInfosWithLocation, DEFAULT_ZOOM);
@@ -517,5 +482,8 @@ public class RoutesActivity extends AppCompatActivity implements
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 
+    private void setAppTitle(String s){
+        this.setTitle(s);
+    }
 
 }

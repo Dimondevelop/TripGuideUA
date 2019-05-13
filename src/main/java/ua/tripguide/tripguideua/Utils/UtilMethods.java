@@ -31,7 +31,7 @@ public class UtilMethods {
 
 
         return new RouteObjectsInfo(lstObjectBreakList.get(indexOfMin).getPlace_id(), lstObjectBreakList.get(indexOfMin).getName_object(),
-                lstObjectBreakList.get(indexOfMin).getWorking_hours(), lstObjectBreakList.get(indexOfMin).getAverage_duration(),
+                lstObjectBreakList.get(indexOfMin).getWorking_hours(), lstObjectBreakList.get(indexOfMin).getAverage_duration(),  lstObjectBreakList.get(indexOfMin).getPrice(),
                 new LatLng(lstObjectBreakList.get(indexOfMin).getCoordinate_x(),lstObjectBreakList.get(indexOfMin).getCoordinate_y()));
     }
 

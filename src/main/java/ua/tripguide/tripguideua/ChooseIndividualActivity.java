@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 import ua.tripguide.tripguideua.Adapters.ExcursionSpinnerAdapter;
@@ -36,9 +35,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
     private static final String TAG = ChooseIndividualActivity.class.getSimpleName();
     Context mContext;
-
     int cityId;
-
     ArrayList<SpinnerList> typeOfExcursionList, priceOfExcursionList, durationOfExursionList;
     CheckBox checkBoxActual, checkBoxSightseeing, checkBoxAttractions, checkBoxArchitecture, checkBoxNature, checkBoxMuseum, chb_visible;
     LinearLayout llCreateExcurion, llActual, llSightseeing, llAttractions, llArchitecture, llNature, llMuseum, ll_visible;
@@ -54,6 +51,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
     float[] coordinates_x, coordinates_y;
     String[] titles, working_hours, place_ids;
     int[] average_duration;
+    int[] price;
 
     SelectAgainSpinner spTypeSpinner;
     Spinner spPriceSpinner, spDurationSpinner;
@@ -79,7 +77,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         lstObjectList = dbHelper.getObjectsFromDB(cityId, false);
 
-
         typeOfExcursionList = new ArrayList<>();
 
         typeOfExcursionList.add(new SpinnerList("актуальний", "Актуальна",
@@ -94,8 +91,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                         "твори архітектури і містобудування, житлові і громадські будівлі, будівлі промислових підприємств, інженерні споруди " +
                         "(фортеці, мости, башти), мавзолеї, будівлі культурного призначення та інші споруди", R.drawable.architecture));
         typeOfExcursionList.add(new SpinnerList("природа", "Природа",
-                "Природні об'єкти - ліси, гаї, парки, річки, озера, ставки, заповідники, заказники, окремі дерева, реліктові рослини\n" +
-                        "\n", R.drawable.nature));
+                "Природні об'єкти - ліси, гаї, парки, річки, озера, ставки, заповідники, заказники, окремі дерева, реліктові рослини", R.drawable.nature));
         typeOfExcursionList.add(new SpinnerList("музей", "Музеї",
                 "Експозиції державних і народних музеїв, картинних галерей, постійних і тимчасових виставок", R.drawable.museum));
         typeOfExcursionList.add(new SpinnerList("обрати", "Обрати декілька",
@@ -295,7 +291,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
 
         priceOfExcursionList = new ArrayList<>();
-        priceOfExcursionList.add(new SpinnerList("122", "Будь-яка",
+        priceOfExcursionList.add(new SpinnerList("999999", "Будь-яка",
                 "Додавати до маршруту всі підходящі по обраних критеріяк туристичні об'єкти, незалежно від ціни", R.drawable.question));
         priceOfExcursionList.add(new SpinnerList("0", "Безкоштовно",
                 "Прокласти маршрут з безкоштовними туристичними об'єктами", R.drawable.free_price));
@@ -303,7 +299,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                 "Надавати перевагу туристичним об'єктам з нижчою ціною", R.drawable.cheap_price));
         priceOfExcursionList.add(new SpinnerList("120", "Щось середнє",
                 "Додати до маршруту декілька платних туристичних об'єктів, якщо вони більше підходять по обраних критеріях", R.drawable.normal_price));
-
 
         spPriceSpinner = findViewById(R.id.sp_price_spinner);
         ExcursionSpinnerAdapter spinnerTwoAdapter = new ExcursionSpinnerAdapter(this, priceOfExcursionList);
@@ -338,12 +333,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 chb_visible.toggle();
-
-                if (chb_visible.isChecked()) {
-                    breakTime = true;
-                } else if (!chb_visible.isChecked()) {
-                    breakTime = false;
-                }
             }
         });
 
@@ -353,28 +342,31 @@ public class ChooseIndividualActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
                 lstROI = new ArrayList<>();
                 int selectedPrice = Integer.valueOf(spPriceSpinner.getSelectedItem().toString());
 
-
                 for (int i = 0; i < lstObjectList.size(); i++) {
-                    if (lstObjectList.get(i).getType_object().contains(spTypeSpinner.getSelectedItem().toString()) || (types != null && UtilMethods.containsArray(lstObjectList.get(i).getType_object(), types))) {
+                    if (lstObjectList.get(i).getType_object()
+                            .contains(spTypeSpinner.getSelectedItem().toString()) ||
+                            (types != null && UtilMethods
+                                    .containsArray(lstObjectList.get(i).getType_object(), types))) {
+
                         if (lstObjectList.get(i).getPrice() <= selectedPrice) {
-
-                            lstROI.add(new RouteObjectsInfo(lstObjectList.get(i).getPlace_id(), lstObjectList.get(i).getName_object(),
-                                    lstObjectList.get(i).getWorking_hours(), lstObjectList.get(i).getAverage_duration(),
-                                    (new LatLng(lstObjectList.get(i).getCoordinate_x(), lstObjectList.get(i).getCoordinate_y()))));
-
-//                            Log.i(TAG, "ObjectList(debug): " + lstObjectList.get(i).getName_object()
-//                                    + " \nТип: " + lstObjectList.get(i).getType_object()
-//                                    + "\nЦіна: " + lstObjectList.get(i).getPrice()
-//                                    + "\nТривалість: " + lstObjectList.get(i).getAverage_duration() + "хв");
+                            lstROI.add(new RouteObjectsInfo(lstObjectList.get(i).getPlace_id(),
+                                    lstObjectList.get(i).getName_object(),
+                                    lstObjectList.get(i).getWorking_hours(),
+                                    lstObjectList.get(i).getAverage_duration(),
+                                    lstObjectList.get(i).getPrice(),
+                                    (new LatLng(lstObjectList.get(i).getCoordinate_x(),
+                                            lstObjectList.get(i).getCoordinate_y()))));
                         }
                     }
                 }
+
                 int countAvg = 0;
 
-                if (lstROI != null && lstROI.isEmpty() && types != null && types.isEmpty()) {
+                if ((lstROI == null || lstROI.isEmpty()) && (types == null || types.isEmpty())) {
 
                     TextView title = new TextView(mContext);
                     title.setText("Увага!");
@@ -385,7 +377,8 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCustomTitle(title)
-                            .setMessage("В обраному місті не знайдено результатів з такими параметрами! Спробуйте інші параметри.")
+                            .setMessage("В обраному місті не знайдено результатів з такими параметрами! " +
+                                    "Спробуйте інші параметри.")
                             .setCancelable(false)
                             .setNegativeButton("ОК",
                                     new DialogInterface.OnClickListener() {
@@ -420,6 +413,13 @@ public class ChooseIndividualActivity extends AppCompatActivity {
 //                    if (types != null)
 //                        Log.i(TAG, "ТИПИ(debug2): " + Arrays.toString(types.toArray()));
 
+
+                    if (chb_visible.isChecked()) {
+                        breakTime = true;
+                    } else if (!chb_visible.isChecked()) {
+                        breakTime = false;
+                    }
+
                     int countObjects = lstROI.size();
                     coordinates_x = new float[countObjects];
                     coordinates_y = new float[countObjects];
@@ -427,6 +427,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                     working_hours = new String[countObjects];
                     place_ids = new String[countObjects];
                     average_duration = new int[countObjects];
+                    price = new int[countObjects];
 
                     for (int i = 0; i < countObjects; i++) {
                         coordinates_x[i] = (float) lstROI.get(i).getLatLng().latitude;
@@ -435,6 +436,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                         working_hours[i] = lstROI.get(i).getWorking_hour();
                         place_ids[i] = lstROI.get(i).getPlace_id();
                         average_duration[i] = lstROI.get(i).getAverage_duration();
+                        price[i] = lstROI.get(i).getPrice();
                     }
 
                     Context vContext = v.getContext();
@@ -447,6 +449,7 @@ public class ChooseIndividualActivity extends AppCompatActivity {
                     intent.putExtra("working_hours", working_hours);
                     intent.putExtra("place_ids", place_ids);
                     intent.putExtra("average_duration", average_duration);
+                    intent.putExtra("price", price);
                     vContext.startActivity(intent);
                 }
             }
@@ -461,7 +464,8 @@ public class ChooseIndividualActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private ArrayList<RouteObjectsInfo> cutDownRoute(int countMinutes, int selectedMinutes, ArrayList<RouteObjectsInfo> routeObjectsInfos) {
+    private ArrayList<RouteObjectsInfo> cutDownRoute(int countMinutes, int selectedMinutes,
+                                                     ArrayList<RouteObjectsInfo> routeObjectsInfos) {
         if (selectedMinutes == 0) {
             return routeObjectsInfos;
         } else if (countMinutes > selectedMinutes) {
@@ -472,7 +476,6 @@ public class ChooseIndividualActivity extends AppCompatActivity {
             for (int i = 0; i < routeObjectsInfos.size(); i++) {
                 countMinutes += routeObjectsInfos.get(i).getAverage_duration();
             }
-
             return cutDownRoute(countMinutes, selectedMinutes, routeObjectsInfos);
         } else
             return routeObjectsInfos;

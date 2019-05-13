@@ -201,7 +201,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             do {
                 Cursor userCursorObj = db.rawQuery("select " + COLUMN_OBJECT_NAME + "," + COLUMN_OBJECT_PLACE_ID + "," + COLUMN_OBJECT_WORK_TIME + "," +
-                        COLUMN_OBJECT_AVERAGE_DURATION + "," + COLUMN_OBJECT_COORDINATE_X + "," + COLUMN_OBJECT_COORDINATE_Y +
+                        COLUMN_OBJECT_AVERAGE_DURATION + "," + COLUMN_OBJECT_COORDINATE_X + "," + COLUMN_OBJECT_COORDINATE_Y + "," + COLUMN_OBJECT_PRICE +
                         " from " + TABLE_OBJECTS + " where " + COLUMN_OBJECT_ID + " IN (" + userCursor.getString(typeExcutsionIndex) + ") and " + COLUMN_CITY_ID_OBJECT + " = " + cityId, null);
                 if (userCursorObj.moveToFirst()) {
                     lstExcursion.add(new Excursion(
@@ -245,15 +245,16 @@ public class DBHelper extends SQLiteOpenHelper {
         int averageDurationObjectIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_AVERAGE_DURATION);
         int coordinateXIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_COORDINATE_X);
         int coordinateYIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_COORDINATE_Y);
+        int priceObjectIndex = userCursorObj.getColumnIndex(COLUMN_OBJECT_PRICE);
         do {
             lstRouteObjectsInfos.add(new RouteObjectsInfo(
                     userCursorObj.getString(placeIdIndex),
                     userCursorObj.getString(nameObjectIndex),
                     userCursorObj.getString(workTimeObjectIndex),
                     userCursorObj.getInt(averageDurationObjectIndex),
+                    userCursorObj.getInt(priceObjectIndex),
                     new LatLng(userCursorObj.getFloat(coordinateXIndex),
                             userCursorObj.getFloat(coordinateYIndex))));
-
         } while (userCursorObj.moveToNext());
 
         return lstRouteObjectsInfos;
